@@ -235,8 +235,19 @@ def bot_message(message):
         else:
             word = message.text.strip().lower()
             try:
-                final_message = wikipedia.summary(word)
+                # search for articles related to the input query
+                results = wikipedia.search(word, results=1)
+                if results:
+                    # get the summary of the first article from the search results
+                    final_message = wikipedia.summary(results[0])
+                else:
+                    final_message = "Ой, ты слишком умный для википедии. Я ничего не нашел"
+            except wikipedia.exceptions.DisambiguationError as e:
+                # handle disambiguation error by printing the list of options
+                final_message = f"Ой, я ничего не смог найти по запросу '{e.title}'. Попробуй следующие варианты:\n\n"
+                final_message += "\n".join(e.options)
             except wikipedia.exceptions.PageError:
-                final_message = "Ой.. Ты слишком умный что знаешь таки слова, ведь википедия впервые такое видит!"
+                final_message = "Ой, ты слишком умный для википедии. Я ничего не нашел"
             bot.send_message(message.chat.id, final_message, parse_mode="HTML")
+
 bot.polling()
