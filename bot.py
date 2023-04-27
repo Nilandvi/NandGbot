@@ -3,6 +3,8 @@ from telebot import types
 import random
 from data.config import TOKEN
 from data.models import User, Note, Session, Economic, Inco
+import pywhatkit as kit
+import os
 
 bot = telebot.TeleBot(TOKEN)
 
@@ -199,6 +201,22 @@ def show_inc_handler(message):
         bot.reply_to(message, "Ваши доходы:")
         for note in notes:
             bot.send_message(message.chat.id, note.incom)
+
+if not os.path.exists('asciiart'):
+    os.makedirs('asciiart')
+
+@bot.message_handler(content_types=['photo'])
+def handle_photo(message):
+    photo = message.photo[-1]
+    file_info = bot.get_file(photo.file_id)
+    downloaded_file = bot.download_file(file_info.file_path)
+    with open('asciiart/image.jpg', 'wb') as new_file:
+        new_file.write(downloaded_file)
+    ascii_art = kit.image_to_ascii_art('asciiart/image.jpg', "Твоя картинка")
+    with open('asciiart/Твоя картинка.txt', 'w') as file:
+        file.write(ascii_art)
+    with open('asciiart/Твоя картинка.txt', 'rb') as file:
+        bot.send_document(message.chat.id, file)
 
 
 @bot.message_handler(content_types=['text'])
