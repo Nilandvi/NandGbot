@@ -232,7 +232,7 @@ if not os.path.exists('asciiart'):
 
 
 
-@bot.message_handler(commands="static")
+@bot.message_handler(commands=["static"])
 def econom_static(message):
     user = Session().query(User).filter_by(chat_id=message.chat.id).first()
     if not user:
