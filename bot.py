@@ -15,7 +15,12 @@ def start_handler(message):
             user = User(chat_id=message.chat.id, username=message.chat.username)
             session.add(user)
             session.commit()
-        bot.reply_to(message, f"Привет, {user.username}\nТелеграм бот на питоне. Вид сбоку.\nХолст. Масло.")
+    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    button1 = types.KeyboardButton('/new_note')
+    button2 = types.KeyboardButton('/show_notes')
+    button3 = types.KeyboardButton('/delete_note')
+    keyboard.add(button1, button2, button3)
+    bot.reply_to(message, f"Привет, {user.username}\nТелеграм бот на питоне. Вид сбоку.\nХолст. Масло.",  reply_markup=keyboard)
 
 
 @bot.message_handler(commands=['new_note'])
