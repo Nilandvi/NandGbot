@@ -9,20 +9,19 @@ bot = telebot.TeleBot(TOKEN)
 
 @bot.message_handler(commands=['start'])
 def start_handler(message):
-    session = Session()
-    user = session.query(User).filter_by(chat_id=message.chat.id).first()
-    if user is None:
-        user = User(chat_id=message.chat.id, username=message.chat.username)
-        session.add(user)
-        session.commit()
-    session.close()
-    bot.reply_to(message, f"Привет, {user.username}! Я бот.")
+    with Session() as session:
+        user = session.query(User).filter_by(chat_id=message.chat.id).first()
+        if user is None:
+            user = User(chat_id=message.chat.id, username=message.chat.username)
+            session.add(user)
+            session.commit()
+        bot.reply_to(message, f"Привет, {user.username}\nТелеграм бот на питоне. Вид сбоку.\nХолст. Масло.")
+
 
 @bot.message_handler(commands=['new_note'])
 def new_note_handler(message):
     session = Session()
     user = session.query(User).filter_by(chat_id=message.chat.id).first()
-    user = Session().query(User).filter_by(chat_id=message.chat.id).first()
     if not user:
         bot.reply_to(message, "Вы еще не зарегистрировались в боте!")
         return
