@@ -6,6 +6,8 @@ from data.models import User, Note, Session, Economic, Inco
 import pywhatkit as kit
 import os
 import wikipedia
+wikipedia.set_lang("ru")
+
 
 bot = telebot.TeleBot(TOKEN)
 
