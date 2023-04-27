@@ -28,6 +28,27 @@ class Note(Base):
         return f"<Note for user_id='{self.user_id}' with text='{self.note_text}'>"
 
 
+class Economic(Base):
+    __tablename__ = 'economs'
+
+    id = Column(Integer, primary_key=True)
+    expenss = Column(Integer, unique=False)
+    user_id = Column(Integer)
+
+    def __repr__(self):
+        return f"<Economic for user_id='{self.user_id}>"
+
+
+class Inco(Base):
+    __tablename__ = 'incomes'
+
+    id = Column(Integer, primary_key=True)
+    incom = Column(Integer, unique=False)
+    user_id = Column(Integer)
+
+    def __repr__(self):
+        return f"<Inco for user_id='{self.user_id}>"
+
 
 Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)

@@ -2,7 +2,7 @@ import telebot
 from telebot import types
 import random
 from data.config import TOKEN
-from data.models import User, Note, Session
+from data.models import User, Note, Session, Economic, Inco
 
 bot = telebot.TeleBot(TOKEN)
 
@@ -109,6 +109,97 @@ def remove_note(message, user_id):
     bot.reply_to(message, "Заметка успешно удалена!")
 
 
+@bot.message_handler(commands=['expenses'])
+def expens(message):
+    session = Session()
+    user = session.query(User).filter_by(chat_id=message.chat.id).first()
+    if not user:
+        bot.reply_to(message, "Вы еще не зарегистрировались в боте!")
+        return
+    bot.reply_to(message, 'Введите расходы целым числом:')
+    bot.register_next_step_handler(message, expen, user.id)
+
+
+def expen(message, user_id):
+    session = Session()
+    if not message.text.isdigit():
+        bot.reply_to(message, "расходы должны быть записаны целым числом. Попробуйте еще раз:")
+        bot.register_next_step_handler(message, expen, user_id)
+        return
+    exc = int(message.text)
+    if exc < 0:
+        bot.reply_to(message, "Расходы не могут быть отрицательными")
+        bot.register_next_step_handler(message, expen, user_id)
+        return
+    e = Economic(user_id=str(user_id), expenss=message.text)
+    session.add(e)
+    session.commit()
+    bot.reply_to(message, 'Расходы добавлены!')
+
+
+@bot.message_handler(commands=['incomes'])
+def incoms(message):
+    session = Session()
+    user = session.query(User).filter_by(chat_id=message.chat.id).first()
+    if not user:
+        bot.reply_to(message, "Вы еще не зарегистрировались в боте!")
+        return
+    bot.reply_to(message, 'Введите доходы целым числом:')
+    bot.register_next_step_handler(message, incom, user.id)
+
+
+def incom(message, user_id):
+    session = Session()
+    if not message.text.isdigit():
+        bot.reply_to(message, "доходы должны быть записаны целым числом. Попробуйте еще раз:")
+        bot.register_next_step_handler(message, incom, user_id)
+        return
+    exc = int(message.text)
+    if exc < 0:
+        bot.reply_to(message, "Доходы не могут быть отрицательными")
+        bot.register_next_step_handler(message, incom, user_id)
+        return
+    e = Inco(user_id=str(user_id), incom=message.text)
+    session.add(e)
+    session.commit()
+    bot.reply_to(message, 'Доходы добавлены!')
+
+
+@bot.message_handler(commands=['show_expenses'])
+def show_exp_handler(message):
+    # Получаем текущего пользователя
+    user = Session().query(User).filter_by(chat_id=message.chat.id).first()
+    if not user:
+        bot.reply_to(message, "Вы еще не зарегистрировались в боте!")
+        return
+
+    # Получаем все заметки текущего пользователя
+    notes = Session().query(Economic).filter_by(user_id=user.id).all()
+    if not notes:
+        bot.reply_to(message, "У вас еще нет записанных расходов.")
+    else:
+        bot.reply_to(message, "Ваши расходы:")
+        for note in notes:
+            bot.send_message(message.chat.id, note.expenss)
+
+
+@bot.message_handler(commands=['show_incomes'])
+def show_inc_handler(message):
+    # Получаем текущего пользователя
+    user = Session().query(User).filter_by(chat_id=message.chat.id).first()
+    if not user:
+        bot.reply_to(message, "Вы еще не зарегистрировались в боте!")
+        return
+
+    # Получаем все заметки текущего пользователя
+    notes = Session().query(Inco).filter_by(user_id=user.id).all()
+    if not notes:
+        bot.reply_to(message, "У вас еще нет записанных доходов.")
+    else:
+        bot.reply_to(message, "Ваши доходы:")
+        for note in notes:
+            bot.send_message(message.chat.id, note.incom)
+
 
 @bot.message_handler(content_types=['text'])
 def bot_message(message):
@@ -119,7 +210,6 @@ def bot_message(message):
             bot.send_message(message.chat.id, "Ваше число: " + str(random.randint(0, 1000)))
         if message.text == "расскажи обо мне":
             bot.reply_to(message, f"""Ты {user.username} \n Твой ID в боте: {user.id} \n ID нашего диалога: {user.chat_id} \n Скоро я научусь вести полноценную статистику сообщений и смогу помогать тебе. Жди!""")
-
 
 
 bot.polling()
