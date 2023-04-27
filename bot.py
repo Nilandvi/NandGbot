@@ -21,22 +21,11 @@ def start_handler(message):
             session.add(user)
             session.commit()
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    button1 = types.KeyboardButton('/notes')
+    button1 = types.KeyboardButton('📝Заметки')
     button2 = types.KeyboardButton('/income')
     button3 = types.KeyboardButton('/expense')
     keyboard.add(button1, button2, button3)
     bot.reply_to(message, f"Привет, {user.username}\nТелеграм бот на питоне. Вид сбоку.\nХолст. Масло.",  reply_markup=keyboard)
-
-@bot.message_handler(commands=['notes'])
-def open_btn_n(message):
-    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    button1 = types.KeyboardButton('/new_note')
-    button2 = types.KeyboardButton('/show_notes')
-    button3 = types.KeyboardButton('/delete_note')
-    bt = types.KeyboardButton('/back')
-    keyboard.add(button1, button2, button3, bt)
-    bot.reply_to(message, f"Заметки и описание их, лень писать", reply_markup=keyboard)
-
 
 @bot.message_handler(commands=['expense'])
 def open_btn_e(message):
@@ -56,7 +45,6 @@ def open_btn_i(message):
     bt = types.KeyboardButton('/back')
     keyboard.add(button1, button2, bt)
     bot.reply_to(message, f"Доходы и описание их, лень писать", reply_markup=keyboard)
-
 
 @bot.message_handler(commands=['back'])
 def back(message):
@@ -242,6 +230,36 @@ def show_inc_handler(message):
 if not os.path.exists('asciiart'):
     os.makedirs('asciiart')
 
+
+
+@bot.message_handler(commands="static")
+def econom_static(message):
+    user = Session().query(User).filter_by(chat_id=message.chat.id).first()
+    if not user:
+        bot.reply_to(message, "Вы еще не зарегистрировались в боте!")
+        return
+
+    notes = Session().query(Inco).filter_by(user_id=user.id).all()
+    notesexp = Session().query(Economic).filter_by(user_id=user.id).all()
+    if not notes and not notesexp:
+        bot.reply_to(message, "У вас еще нет записанных доходов и расходов. Статистика невозможна.")
+
+    else:
+        summ = 0
+        ub = 0
+        for note in notes:
+            summ += int(note.incom)
+        for exp in notesexp:
+            ub += int(exp.expenss)
+        total = summ - ub
+        if total < 0: 
+            bot.send_message(message.chat.id, "Знаете, если ваши расходы превышают доходы, у налоговой будет много вопросов к вам, но я не в праве Вам мешать:")
+        bot.reply_to(message, f"+{summ}, - {ub}, == {total}")
+            
+
+        #bot.reply_to(message, f"Ваш текущий счет: {}")
+
+
 @bot.message_handler(content_types=['photo'])
 def handle_photo(message):
     photo = message.photo[-1]
@@ -255,7 +273,6 @@ def handle_photo(message):
     with open('asciiart/Твоя картинка.txt', 'rb') as file:
         bot.send_document(message.chat.id, file)
 
-
 @bot.message_handler(content_types=['text'])
 def bot_message(message):
     session = Session()
@@ -265,7 +282,14 @@ def bot_message(message):
             bot.send_message(message.chat.id, "Ваше число: " + str(random.randint(0, 1000)))
         if message.text == "расскажи обо мне":
             bot.reply_to(message, f"""Ты {user.username} \n Твой ID в боте: {user.id} \n ID нашего диалога: {user.chat_id} \n Скоро я научусь вести полноценную статистику сообщений и смогу помогать тебе. Жди!""")
-
+        if message.text == "📝Заметки":
+            keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+            button1 = types.KeyboardButton('/new_note')
+            button2 = types.KeyboardButton('/show_notes')
+            button3 = types.KeyboardButton('/delete_note')
+            bt = types.KeyboardButton('/back')
+            keyboard.add(button1, button2, button3, bt)
+            bot.reply_to(message, f"Заметки и описание их, лень писать", reply_markup=keyboard)
         else:
             word = message.text.strip().lower()
             try:
@@ -278,10 +302,13 @@ def bot_message(message):
                     final_message = "Ой, ты слишком умный для википедии. Я ничего не нашел"
             except wikipedia.exceptions.DisambiguationError as e:
                 # handle disambiguation error by printing the list of options
-                final_message = f"Ой, я ничего не смог найти по запросу '{e.title}'. Попробуй следующие варианты:\n\n"
+                final_message = f"Ой, я ничего не смог найти по запросу '{e.title}'. Попробуй переформулировать вопрос или следующие варианты:\n\n"
                 final_message += "\n".join(e.options)
             except wikipedia.exceptions.PageError:
                 final_message = "Ой, ты слишком умный для википедии. Я ничего не нашел"
             bot.send_message(message.chat.id, final_message, parse_mode="HTML")
+
+
+
 
 bot.polling()
