@@ -5,6 +5,7 @@ from data.config import TOKEN
 from data.models import User, Note, Session, Economic, Inco
 import pywhatkit as kit
 import os
+import wikipedia
 
 bot = telebot.TeleBot(TOKEN)
 
@@ -229,5 +230,11 @@ def bot_message(message):
         if message.text == "расскажи обо мне":
             bot.reply_to(message, f"""Ты {user.username} \n Твой ID в боте: {user.id} \n ID нашего диалога: {user.chat_id} \n Скоро я научусь вести полноценную статистику сообщений и смогу помогать тебе. Жди!""")
 
-
+        else:
+            word = message.text.strip().lower()
+            try:
+                final_message = wikipedia.summary(word)
+            except wikipedia.exceptions.PageError:
+                final_message = "Ой.. Ты слишком умный что знаешь таки слова, ведь википедия впервые такое видит!"
+            bot.send_message(message.chat.id, final_message, parse_mode="HTML")
 bot.polling()
