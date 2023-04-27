@@ -21,12 +21,46 @@ def start_handler(message):
             session.add(user)
             session.commit()
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    button1 = types.KeyboardButton('/new_note')
-    button2 = types.KeyboardButton('/show_notes')
-    button3 = types.KeyboardButton('/delete_note')
+    button1 = types.KeyboardButton('/notes')
+    button2 = types.KeyboardButton('/income')
+    button3 = types.KeyboardButton('/expense')
     keyboard.add(button1, button2, button3)
     bot.reply_to(message, f"Привет, {user.username}\nТелеграм бот на питоне. Вид сбоку.\nХолст. Масло.",  reply_markup=keyboard)
 
+@bot.message_handler(commands=['notes'])
+def open_btn_n(message):
+    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    button1 = types.KeyboardButton('/new_note')
+    button2 = types.KeyboardButton('/show_notes')
+    button3 = types.KeyboardButton('/delete_note')
+    bt = types.KeyboardButton('/back')
+    keyboard.add(button1, button2, button3, bt)
+    bot.reply_to(message, f"Заметки и описание их, лень писать", reply_markup=keyboard)
+
+
+@bot.message_handler(commands=['expense'])
+def open_btn_e(message):
+    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    button1 = types.KeyboardButton('/expenses')
+    button2 = types.KeyboardButton('/show_expenses')
+    bt = types.KeyboardButton('/back')
+    keyboard.add(button1, button2, bt)
+    bot.reply_to(message, f"Расходы и описание их, лень писать", reply_markup=keyboard)
+
+
+@bot.message_handler(commands=['income'])
+def open_btn_i(message):
+    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    button1 = types.KeyboardButton('/incomes')
+    button2 = types.KeyboardButton('/show_incomes')
+    bt = types.KeyboardButton('/back')
+    keyboard.add(button1, button2, bt)
+    bot.reply_to(message, f"Доходы и описание их, лень писать", reply_markup=keyboard)
+
+
+@bot.message_handler(commands=['back'])
+def back(message):
+    bot.register_next_step_handler(message, start_handler)
 
 @bot.message_handler(commands=['new_note'])
 def new_note_handler(message):
