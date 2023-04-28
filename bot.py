@@ -21,45 +21,25 @@ def start_handler(message):
             session.add(user)
             session.commit()
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    button1 = types.KeyboardButton('📝Заметки')
-    button2 = types.KeyboardButton('/income')
-    button3 = types.KeyboardButton('/expense')
-    keyboard.add(button1, button2, button3)
-    bot.reply_to(message, f"Привет, {user.username}\nТелеграм бот на питоне. Вид сбоку.\nХолст. Масло.",  reply_markup=keyboard)
-
-@bot.message_handler(commands=['expense'])
-def open_btn_e(message):
-    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    button1 = types.KeyboardButton('/expenses')
-    button2 = types.KeyboardButton('/show_expenses')
-    bt = types.KeyboardButton('/back')
-    keyboard.add(button1, button2, bt)
-    bot.reply_to(message, f"Расходы и описание их, лень писать", reply_markup=keyboard)
+    button1 = types.KeyboardButton('🗓Заметки')
+    button2 = types.KeyboardButton('📊Кошелек')
+    button3 = types.KeyboardButton('👨‍💻Разработчики')
+    button4 = types.KeyboardButton('ℹ️Помощь')
+    keyboard.add(button1, button2, button3, button4)
+    bot.reply_to(message, f"👋Добро пожаловать, {user.username}!\nВы успешно зарегистрировались✅\nТелеграм бот на питоне. Вид сбоку.\nХолст. Масло. 🖼",  reply_markup=keyboard)
 
 
-@bot.message_handler(commands=['income'])
-def open_btn_i(message):
-    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    button1 = types.KeyboardButton('/incomes')
-    button2 = types.KeyboardButton('/show_incomes')
-    bt = types.KeyboardButton('/back')
-    keyboard.add(button1, button2, bt)
-    bot.reply_to(message, f"Доходы и описание их, лень писать", reply_markup=keyboard)
-
-@bot.message_handler(commands=['back'])
-def back(message):
-    bot.register_next_step_handler(message, start_handler)
 
 @bot.message_handler(commands=['new_note'])
 def new_note_handler(message):
     session = Session()
     user = session.query(User).filter_by(chat_id=message.chat.id).first()
     if not user:
-        bot.reply_to(message, "Вы еще не зарегистрировались в боте!")
+        bot.reply_to(message, "🔐Вы еще не зарегистрировались в боте!")
         return
     
     # Получаем текст новой заметки от пользователя
-    bot.reply_to(message, "Введите текст заметки:")
+    bot.reply_to(message, "📝Введите текст заметки:")
     bot.register_next_step_handler(message, create_new_note, user.id)
 
 
@@ -69,7 +49,7 @@ def create_new_note(message, user_id):
         note = Note(user_id=str(user_id), note_text=message.text)
         session.add(note)
         session.commit()
-        bot.send_message(chat_id=message.chat.id, text='Note added successfully!')
+        bot.send_message(chat_id=message.chat.id, text='✅Заметка добавлена')
     else:
         print(f'Invalid message type: {type(message)}')
 
@@ -78,54 +58,54 @@ def show_notes_handler(message):
     # Получаем текущего пользователя
     user = Session().query(User).filter_by(chat_id=message.chat.id).first()
     if not user:
-        bot.reply_to(message, "Вы еще не зарегистрировались в боте!")
+        bot.reply_to(message, "🔐Вы еще не зарегистрировались в боте!")
         return
 
     # Получаем все заметки текущего пользователя
     notes = Session().query(Note).filter_by(user_id=user.id).all()
     if not notes:
-        bot.reply_to(message, "У вас еще нет заметок.")
+        bot.reply_to(message, "📛У вас еще нет заметок.")
     else:
-        bot.reply_to(message, "Ваши заметки:")
+        bot.reply_to(message, "🗓Ваши заметки:")
         for note in notes:
-            bot.send_message(message.chat.id, note.note_text)
+            bot.send_message(message.chat.id, f"📝 {note.note_text}")
 
 @bot.message_handler(commands=['delete_note'])
 def delete_note_handler(message):
     session = Session()
     user = session.query(User).filter_by(chat_id=message.chat.id).first()
     if not user:
-        bot.reply_to(message, "Вы еще не зарегистрировались в боте!")
+        bot.reply_to(message, "🔐Вы еще не зарегистрировались в боте!")
         return
 
     # Получаем все заметки текущего пользователя
     notes = session.query(Note).filter_by(user_id=user.id).all()
     if not notes:
-        bot.reply_to(message, "У вас еще нет заметок.")
+        bot.reply_to(message, "📛У вас еще нет заметок.")
         return
 
     # Просим пользователя выбрать заметку, которую нужно удалить
     note_text = "\n".join([f"{i + 1}. {note.note_text}" for i, note in enumerate(notes)])
-    bot.reply_to(message, f"Выберите номер заметки, которую нужно удалить:\n{note_text}")
+    bot.reply_to(message, f"🔢Выберите номер заметки, которую нужно удалить:\n{note_text}")
     bot.register_next_step_handler(message, remove_note, user.id)
 
 
 def remove_note(message, user_id):
     session = Session()
     if not message.text.isdigit():
-        bot.reply_to(message, "Номер заметки должен быть целым числом. Попробуйте еще раз:")
+        bot.reply_to(message, "📛Номер заметки должен быть целым числом. Попробуйте еще раз:")
         bot.register_next_step_handler(message, remove_note, user_id)
         return
 
     # Получаем все заметки текущего пользователя
     notes = session.query(Note).filter_by(user_id=user_id).all()
     if not notes:
-        bot.reply_to(message, "У вас еще нет заметок.")
+        bot.reply_to(message, "📛У вас еще нет заметок.")
         return
 
     note_number = int(message.text)
     if note_number < 1 or note_number > len(notes):
-        bot.reply_to(message, "Некорректный номер заметки. Попробуйте еще раз:")
+        bot.reply_to(message, "📛Некорректный номер заметки. Попробуйте еще раз:")
         bot.register_next_step_handler(message, remove_note, user_id)
         return
 
@@ -133,7 +113,7 @@ def remove_note(message, user_id):
     note_to_delete = notes[note_number - 1]
     session.delete(note_to_delete)
     session.commit()
-    bot.reply_to(message, "Заметка успешно удалена!")
+    bot.reply_to(message, "✅Заметка успешно удалена!")
 
 
 @bot.message_handler(commands=['expenses'])
@@ -141,27 +121,27 @@ def expens(message):
     session = Session()
     user = session.query(User).filter_by(chat_id=message.chat.id).first()
     if not user:
-        bot.reply_to(message, "Вы еще не зарегистрировались в боте!")
+        bot.reply_to(message, "🔐Вы еще не зарегистрировались в боте!")
         return
-    bot.reply_to(message, 'Введите расходы целым числом:')
+    bot.reply_to(message, '❇️Введите расходы целым числом:')
     bot.register_next_step_handler(message, expen, user.id)
 
 
 def expen(message, user_id):
     session = Session()
     if not message.text.isdigit():
-        bot.reply_to(message, "расходы должны быть записаны целым числом. Попробуйте еще раз:")
+        bot.reply_to(message, "📛расходы должны быть записаны целым числом. Попробуйте еще раз:")
         bot.register_next_step_handler(message, expen, user_id)
         return
     exc = int(message.text)
     if exc < 0:
-        bot.reply_to(message, "Расходы не могут быть отрицательными")
+        bot.reply_to(message, "📛Расходы не могут быть отрицательными")
         bot.register_next_step_handler(message, expen, user_id)
         return
     e = Economic(user_id=str(user_id), expenss=message.text)
     session.add(e)
     session.commit()
-    bot.reply_to(message, 'Расходы добавлены!')
+    bot.reply_to(message, '✅Запись о расходах успешно добавлена!')
 
 
 @bot.message_handler(commands=['incomes'])
@@ -169,27 +149,27 @@ def incoms(message):
     session = Session()
     user = session.query(User).filter_by(chat_id=message.chat.id).first()
     if not user:
-        bot.reply_to(message, "Вы еще не зарегистрировались в боте!")
+        bot.reply_to(message, "🔐Вы еще не зарегистрировались в боте!")
         return
-    bot.reply_to(message, 'Введите доходы целым числом:')
+    bot.reply_to(message, '❇️Введите доходы целым числом:')
     bot.register_next_step_handler(message, incom, user.id)
 
 
 def incom(message, user_id):
     session = Session()
     if not message.text.isdigit():
-        bot.reply_to(message, "доходы должны быть записаны целым числом. Попробуйте еще раз:")
+        bot.reply_to(message, "📛доходы должны быть записаны целым числом. Попробуйте еще раз:")
         bot.register_next_step_handler(message, incom, user_id)
         return
     exc = int(message.text)
     if exc < 0:
-        bot.reply_to(message, "Доходы не могут быть отрицательными")
+        bot.reply_to(message, "📛Доходы не могут быть отрицательными")
         bot.register_next_step_handler(message, incom, user_id)
         return
     e = Inco(user_id=str(user_id), incom=message.text)
     session.add(e)
     session.commit()
-    bot.reply_to(message, 'Доходы добавлены!')
+    bot.reply_to(message, '✅Запись о доходах успешно добавлена!')
 
 
 @bot.message_handler(commands=['show_expenses'])
@@ -197,17 +177,17 @@ def show_exp_handler(message):
     # Получаем текущего пользователя
     user = Session().query(User).filter_by(chat_id=message.chat.id).first()
     if not user:
-        bot.reply_to(message, "Вы еще не зарегистрировались в боте!")
+        bot.reply_to(message, "🔐Вы еще не зарегистрировались в боте!")
         return
 
     # Получаем все заметки текущего пользователя
     notes = Session().query(Economic).filter_by(user_id=user.id).all()
     if not notes:
-        bot.reply_to(message, "У вас еще нет записанных расходов.")
+        bot.reply_to(message, "📛У вас еще нет записанных расходов.")
     else:
-        bot.reply_to(message, "Ваши расходы:")
+        bot.reply_to(message, "✅Ваши расходы:")
         for note in notes:
-            bot.send_message(message.chat.id, note.expenss)
+            bot.send_message(message.chat.id, f"➖ {note.expenss} рублей")
 
 
 @bot.message_handler(commands=['show_incomes'])
@@ -215,35 +195,32 @@ def show_inc_handler(message):
     # Получаем текущего пользователя
     user = Session().query(User).filter_by(chat_id=message.chat.id).first()
     if not user:
-        bot.reply_to(message, "Вы еще не зарегистрировались в боте!")
+        bot.reply_to(message, "🔐Вы еще не зарегистрировались в боте!")
         return
 
     # Получаем все заметки текущего пользователя
     notes = Session().query(Inco).filter_by(user_id=user.id).all()
     if not notes:
-        bot.reply_to(message, "У вас еще нет записанных доходов.")
+        bot.reply_to(message, "📛У вас еще нет записанных доходов.")
     else:
-        bot.reply_to(message, "Ваши доходы:")
+        bot.reply_to(message, "✅Ваши доходы:")
         for note in notes:
-            bot.send_message(message.chat.id, note.incom)
+            bot.send_message(message.chat.id, f"➕ {note.incom} рублей")
 
 if not os.path.exists('asciiart'):
     os.makedirs('asciiart')
-
-
 
 @bot.message_handler(commands=["static"])
 def econom_static(message):
     user = Session().query(User).filter_by(chat_id=message.chat.id).first()
     if not user:
-        bot.reply_to(message, "Вы еще не зарегистрировались в боте!")
+        bot.reply_to(message, "🔐Вы еще не зарегистрировались в боте!")
         return
 
     notes = Session().query(Inco).filter_by(user_id=user.id).all()
     notesexp = Session().query(Economic).filter_by(user_id=user.id).all()
     if not notes and not notesexp:
-        bot.reply_to(message, "У вас еще нет записанных доходов и расходов. Статистика невозможна.")
-
+        bot.reply_to(message, "📛У вас еще нет записанных доходов и расходов. Статистика невозможна.")
     else:
         summ = 0
         ub = 0
@@ -254,10 +231,7 @@ def econom_static(message):
         total = summ - ub
         if total < 0: 
             bot.send_message(message.chat.id, "Знаете, если ваши расходы превышают доходы, у налоговой будет много вопросов к вам, но я не в праве Вам мешать:")
-        bot.reply_to(message, f"+{summ}, - {ub}, == {total}")
-            
-
-        #bot.reply_to(message, f"Ваш текущий счет: {}")
+        bot.reply_to(message, f"👛Ваш кошелек:\n💠Общая сумма: {total}\n➖Затрат за все время: {ub}\n➕Прибыль за все время: {summ}\n")
 
 
 @bot.message_handler(content_types=['photo'])
@@ -278,18 +252,42 @@ def bot_message(message):
     session = Session()
     user = session.query(User).filter_by(chat_id=message.chat.id).first()
     if message.chat.type == "private":
-        if message.text == "число":
-            bot.send_message(message.chat.id, "Ваше число: " + str(random.randint(0, 1000)))
-        if message.text == "расскажи обо мне":
-            bot.reply_to(message, f"""Ты {user.username} \n Твой ID в боте: {user.id} \n ID нашего диалога: {user.chat_id} \n Скоро я научусь вести полноценную статистику сообщений и смогу помогать тебе. Жди!""")
-        if message.text == "📝Заметки":
+        if message.text == "📊Кошелек":
+            keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+            button1 = types.KeyboardButton('/expenses')
+            button2 = types.KeyboardButton('/show_expenses')
+            button3 = types.KeyboardButton('/incomes')
+            button4 = types.KeyboardButton('/show_incomes')
+            button5 = types.KeyboardButton("/static")
+            bt = types.KeyboardButton('⬅️Назад')
+            keyboard.add(button1, button2, button3, button4, button5, bt)
+            bot.reply_to(message, f"🧮Добро пожаловать в раздел управления финансами!\n/expenses - Добавить расходы\n/show_expenses - История расходов\n/incomes - Добавить зачисления\n/show_incomes - История зачислений\n/static - Личный кошелек\n", reply_markup=keyboard)
+        elif message.text == "🗓Заметки":
             keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
             button1 = types.KeyboardButton('/new_note')
             button2 = types.KeyboardButton('/show_notes')
             button3 = types.KeyboardButton('/delete_note')
-            bt = types.KeyboardButton('/back')
+            bt = types.KeyboardButton('⬅️Назад')
             keyboard.add(button1, button2, button3, bt)
-            bot.reply_to(message, f"Заметки и описание их, лень писать", reply_markup=keyboard)
+            bot.reply_to(message, f"📚Добро пожаловать в раздел заметок!\n/new_note - создать новую заметку\n/show_notes - посмотреть свои заметки\n/delete_note - удалить заметку\n", reply_markup=keyboard)
+        elif message.text == "⬅️Назад":
+                keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+                button1 = types.KeyboardButton('🗓Заметки')
+                button2 = types.KeyboardButton('📊Кошелек')
+                button3 = types.KeyboardButton('👨‍💻Разработчики')
+                button4 = types.KeyboardButton('ℹ️Помощь')
+                keyboard.add(button1, button2, button3, button4)
+                bot.send_message(message.chat.id, f"Привет, {user.username}\n✅Ты в главном меню",  reply_markup=keyboard)
+        elif message.text == "👨‍💻Разработчики":
+            keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+            bt = types.KeyboardButton('⬅️Назад')
+            keyboard.add(bt)
+            bot.reply_to(message, f"👨‍💻Разработчики👨‍💻\n@Nilandvi\n@hochypitsu",  reply_markup=keyboard)
+        elif message.text == "ℹ️Помощь":
+            keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+            bt = types.KeyboardButton('⬅️Назад')
+            keyboard.add(bt)
+            bot.send_message(message.chat.id, "Добро пожаловать в N&G бот 👋\nВ этом боте ты сможешь найти много полезного✅\nПомимо большого разнообразия различного контента в боте есть ascii художник и встроенная википедия. \nКоманды ты сможешь найти при переходе на различные пункты.\n🔹Чтобы воспользоваться википедией, тебе достаточно написать интересующее тебе слово мне, и я с радостью предоставлю тебе интересующую информацию.\n🔹Чтобы воспользоваться функционалом ascii художника, просто кидай мне фотографию, а там я сам управлюсь и отправлю тебе результат!\n=====\nУдачного тебе пользования ботом! \nВ случае обнаружения недоработки или бага, зайди в меню разработчиков и напиши нам о недоработке, может быть мы ее пофиксим!\n", reply_markup=keyboard)
         else:
             word = message.text.strip().lower()
             try:
@@ -307,8 +305,6 @@ def bot_message(message):
             except wikipedia.exceptions.PageError:
                 final_message = "Ой, ты слишком умный для википедии. Я ничего не нашел"
             bot.send_message(message.chat.id, final_message, parse_mode="HTML")
-
-
 
 
 bot.polling()
