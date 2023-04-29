@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import telebot
 from telebot import types
 import random
@@ -6,11 +8,42 @@ from data.models import User, Note, Session, Economic, Inco
 import pywhatkit as kit
 import os
 import wikipedia
+import soundfile as sf
+import speech_recognition as sr
+import requests
+import datetime
 wikipedia.set_lang("ru")
 
 
 bot = telebot.TeleBot(TOKEN)
 toggle = 1
+logfile = str(datetime.date.today()) + '.log'
+
+
+def audio_to_text(dest_name: str):
+    r = sr.Recognizer()
+    message = sr.AudioFile(dest_name)
+    with message as source:
+        audio = r.record(source)
+    result = r.recognize_google(audio, language="ru_RU")
+    return result
+
+
+@bot.message_handler(content_types=['voice'])
+def get_audio_messages(message):
+    try:
+        print("Started recognition...")
+        file_info = bot.get_file(message.voice.file_id)
+        doc = requests.get('https://api.telegram.org/file/bot{0}/{1}'.format(TOKEN, file_info.file_path))
+        with open('voice.ogg', 'wb') as f:
+            f.write(doc.content)
+        data, samplerate = sf.read('voice.ogg')
+        sf.write('new_file.wav', data, samplerate)
+        result = audio_to_text('new_file.wav')
+        bot.reply_to(message, result)
+    except sr.UnknownValueError as e:
+        bot.send_message(message.from_user.id,  "Прошу прощения, но я не разобрал сообщение, или оно поустое...")
+
 
 @bot.message_handler(commands=['start'])
 def start_handler(message):
@@ -254,6 +287,7 @@ def handle_photo(message):
     elif toggle == 0:
         bot.send_message(message.chat.id, f"Я не знаю что делать с твоей фотографией")
 
+
 @bot.message_handler(content_types=['text'])
 def bot_message(message):
     session = Session()
@@ -294,7 +328,7 @@ def bot_message(message):
             keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
             bt = types.KeyboardButton('⬅️Назад')
             keyboard.add(bt)
-            bot.send_message(message.chat.id, "Добро пожаловать в N&G бот 👋\nВ этом боте ты сможешь найти много полезного✅\nПомимо большого разнообразия различного контента в боте есть ascii художник и встроенная википедия. \nКоманды ты сможешь найти при переходе на различные пункты.\n🔹Чтобы воспользоваться википедией, тебе достаточно написать интересующее тебе слово мне, и я с радостью предоставлю тебе интересующую информацию.\n🔹Чтобы воспользоваться функционалом ascii художника, просто кидай мне фотографию, а там я сам управлюсь и отправлю тебе результат!\n=====\nУдачного тебе пользования ботом! \nВ случае обнаружения недоработки или бага, зайди в меню разработчиков и напиши нам о недоработке, может быть мы ее пофиксим!\n", reply_markup=keyboard)
+            bot.send_message(message.chat.id, "Добро пожаловать в N&G бот 👋\nВ этом боте ты сможешь найти много полезного✅\nПомимо большого разнообразия различного контента в боте есть ascii художник и встроенная википедия. \nКоманды ты сможешь найти при переходе на различные пункты.\n🔹Чтобы воспользоваться википедией, тебе достаточно написать интересующее тебе слово мне, и я с радостью предоставлю тебе интересующую информацию.\n🔹Чтобы воспользоваться функционалом ascii художника, просто кидай мне фотографию, а там я сам управлюсь и отправлю тебе результат!\nчтобы перевести голосовое сообщение в текст просто запиши его,а я отправлю готовый результат!\n=====\nУдачного тебе пользования ботом! \nВ случае обнаружения недоработки или бага, зайди в меню разработчиков и напиши нам о недоработке, может быть мы ее пофиксим!\n", reply_markup=keyboard)
         else:
             word = message.text.strip().lower()
             try:
