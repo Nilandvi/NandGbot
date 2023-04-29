@@ -33,7 +33,7 @@ def start_handler(message):
     button1 = types.KeyboardButton('🗓Заметки')
     button2 = types.KeyboardButton('📊Кошелек')
     button3 = types.KeyboardButton('👨‍💻Разработчики')
-    webAppTest = types.WebAppInfo("https://telegram.mihailgok.ru") #создаем webappinfo - формат хранения url
+    webAppTest = types.WebAppInfo("https://nilandvi.github.io/NandGbotWEB/") #создаем webappinfo - формат хранения url
     one_butt = types.KeyboardButton(text="Web🌐", web_app=webAppTest) #создаем кнопку типа webapp
     button4 = types.KeyboardButton('ℹ️Помощь')
     keyboard.add(button1, button2, button3, one_butt, button4)
