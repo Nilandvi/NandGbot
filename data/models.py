@@ -50,5 +50,17 @@ class Inco(Base):
         return f"<Inco for user_id='{self.user_id}>"
 
 
+class Calc(Base):
+    __tablename__ = 'calculator'
+
+    id = Column(Integer, primary_key=True)
+    value = Column(Integer, unique=False)
+    old_value = Column(Integer, unique=False)
+    user_id = Column(Integer)
+
+    def __repr__(self):
+        return f"<Calc for user_id='{self.user_id}>"
+
+
 Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)

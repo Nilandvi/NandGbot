@@ -4,7 +4,7 @@ import telebot
 from telebot import types
 import random
 from data.config import TOKEN
-from data.models import User, Note, Session, Economic, Inco
+from data.models import User, Note, Session, Economic, Inco, Calc
 import pywhatkit as kit
 import os
 import wikipedia
@@ -18,6 +18,30 @@ wikipedia.set_lang("ru")
 bot = telebot.TeleBot(TOKEN)
 toggle = 1
 logfile = str(datetime.date.today()) + '.log'
+value = '0'
+old_value = '0'
+
+keyboardd = telebot.types.InlineKeyboardMarkup()
+keyboardd.row(telebot.types.InlineKeyboardButton(' ', callback_data='no'),
+             telebot.types.InlineKeyboardButton('C', callback_data='C'),
+             telebot.types.InlineKeyboardButton('<=', callback_data='<='),
+             telebot.types.InlineKeyboardButton('/', callback_data='/'))
+keyboardd.row(telebot.types.InlineKeyboardButton('7', callback_data='7'),
+             telebot.types.InlineKeyboardButton('8', callback_data='8'),
+             telebot.types.InlineKeyboardButton('9', callback_data='9'),
+             telebot.types.InlineKeyboardButton('*', callback_data='*'))
+keyboardd.row(telebot.types.InlineKeyboardButton('4', callback_data='4'),
+             telebot.types.InlineKeyboardButton('5', callback_data='5'),
+             telebot.types.InlineKeyboardButton('6', callback_data='6'),
+             telebot.types.InlineKeyboardButton('-', callback_data='-'))
+keyboardd.row(telebot.types.InlineKeyboardButton('1', callback_data='1'),
+             telebot.types.InlineKeyboardButton('2', callback_data='2'),
+             telebot.types.InlineKeyboardButton('3', callback_data='3'),
+             telebot.types.InlineKeyboardButton('+', callback_data='+'))
+keyboardd.row(telebot.types.InlineKeyboardButton(' ', callback_data='no'),
+             telebot.types.InlineKeyboardButton('0', callback_data='0'),
+             telebot.types.InlineKeyboardButton(',', callback_data=','),
+             telebot.types.InlineKeyboardButton('=', callback_data='='))
 
 
 def audio_to_text(dest_name: str):
@@ -288,6 +312,52 @@ def handle_photo(message):
         bot.send_message(message.chat.id, f"Я не знаю что делать с твоей фотографией")
 
 
+@bot.message_handler(commands=['calculator'])
+def calc(message):
+    global value
+    user = Session().query(User).filter_by(chat_id=message.chat.id).first()
+    if not user:
+        bot.reply_to(message, "🔐Вы еще не зарегистрировались в боте!")
+        return
+    bot.send_message(message.chat.id, '0', reply_markup=keyboardd)
+    if value == '0':
+        bot.send_message(message.from_user.id, '0', reply_markup=keyboardd)
+    else:
+        bot.send_message(message.from_user.id, value, reply_markup=keyboardd)
+@bot.callback_query_handler(func=lambda call: True)
+def calback(query):
+    global value, old_value
+    user = Session().query(User).filter_by(chat_id=query.message.chat.id).first()
+    if not user:
+        bot.send_message(query.message.from_user.id, "🔐Вы еще не зарегистрировались в боте!")
+        return
+
+    data = query.data
+    if data == 'no':
+        pass
+    elif data == 'C':
+        value = '0'
+    elif data == '<=':
+        if value != '0':
+            value = value[:len(value)-1]
+    elif data == '=':
+        try:
+            value = str(eval(value[1::]))
+        except:
+            value = 'ошибка'
+    else:
+        value += data
+    if (value != old_value and value != '0') or ('0' != old_value and value == '0'):
+        if value == '0':
+            bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text='0',
+                                  reply_markup=keyboardd)
+            old_value = '0'
+        else:
+            bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=value,
+                                  reply_markup=keyboardd)
+            old_value = value
+    if value == 'ошибка':
+        value = '0'
 @bot.message_handler(content_types=['text'])
 def bot_message(message):
     session = Session()
@@ -329,6 +399,8 @@ def bot_message(message):
             bt = types.KeyboardButton('⬅️Назад')
             keyboard.add(bt)
             bot.send_message(message.chat.id, "Добро пожаловать в N&G бот 👋\nВ этом боте ты сможешь найти много полезного✅\nПомимо большого разнообразия различного контента в боте есть ascii художник и встроенная википедия. \nКоманды ты сможешь найти при переходе на различные пункты.\n🔹Чтобы воспользоваться википедией, тебе достаточно написать интересующее тебе слово мне, и я с радостью предоставлю тебе интересующую информацию.\n🔹Чтобы воспользоваться функционалом ascii художника, просто кидай мне фотографию, а там я сам управлюсь и отправлю тебе результат!\nчтобы перевести голосовое сообщение в текст просто запиши его,а я отправлю готовый результат!\n=====\nУдачного тебе пользования ботом! \nВ случае обнаружения недоработки или бага, зайди в меню разработчиков и напиши нам о недоработке, может быть мы ее пофиксим!\n", reply_markup=keyboard)
+        elif message.text == 'отсоси мне':
+            bot.send_message(message.chat.id, 'Дурка выехала....')
         else:
             word = message.text.strip().lower()
             try:
@@ -348,4 +420,4 @@ def bot_message(message):
             bot.send_message(message.chat.id, final_message, parse_mode="HTML")
 
 
-bot.polling()
+bot.polling(none_stop=True, interval=0)
