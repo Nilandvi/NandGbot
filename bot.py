@@ -10,6 +10,15 @@ wikipedia.set_lang("ru")
 
 
 bot = telebot.TeleBot(TOKEN)
+toggle = 1
+
+def webAppKeyboard(): #создание клавиатуры с webapp кнопкой
+   keyboard = types.ReplyKeyboardMarkup(row_width=1) #создаем клавиатуру
+   webAppTest = types.WebAppInfo("https://telegram.mihailgok.ru") #создаем webappinfo - формат хранения url
+   one_butt = types.KeyboardButton(text="Тестовая страница", web_app=webAppTest) #создаем кнопку типа webapp
+   keyboard.add(one_butt) #добавляем кнопки в клавиатуру
+
+   return keyboard #возвращаем клавиатуру
 
 
 @bot.message_handler(commands=['start'])
@@ -24,8 +33,10 @@ def start_handler(message):
     button1 = types.KeyboardButton('🗓Заметки')
     button2 = types.KeyboardButton('📊Кошелек')
     button3 = types.KeyboardButton('👨‍💻Разработчики')
+    webAppTest = types.WebAppInfo("https://telegram.mihailgok.ru") #создаем webappinfo - формат хранения url
+    one_butt = types.KeyboardButton(text="Web🌐", web_app=webAppTest) #создаем кнопку типа webapp
     button4 = types.KeyboardButton('ℹ️Помощь')
-    keyboard.add(button1, button2, button3, button4)
+    keyboard.add(button1, button2, button3, one_butt, button4)
     bot.reply_to(message, f"👋Добро пожаловать, {user.username}!\nВы успешно зарегистрировались✅\nТелеграм бот на питоне. Вид сбоку.\nХолст. Масло. 🖼",  reply_markup=keyboard)
 
 
@@ -236,16 +247,21 @@ def econom_static(message):
 
 @bot.message_handler(content_types=['photo'])
 def handle_photo(message):
-    photo = message.photo[-1]
-    file_info = bot.get_file(photo.file_id)
-    downloaded_file = bot.download_file(file_info.file_path)
-    with open('asciiart/image.jpg', 'wb') as new_file:
-        new_file.write(downloaded_file)
-    ascii_art = kit.image_to_ascii_art('asciiart/image.jpg', "Твоя картинка")
-    with open('asciiart/Твоя картинка.txt', 'w') as file:
-        file.write(ascii_art)
-    with open('asciiart/Твоя картинка.txt', 'rb') as file:
-        bot.send_document(message.chat.id, file)
+    global toggle
+    if toggle == 1:
+        photo = message.photo[-1]
+        file_info = bot.get_file(photo.file_id)
+        downloaded_file = bot.download_file(file_info.file_path)
+        with open('asciiart/image.jpg', 'wb') as new_file:
+            new_file.write(downloaded_file)
+        ascii_art = kit.image_to_ascii_art('asciiart/image.jpg', "Твоя картинка")
+        with open('asciiart/Твоя картинка.txt', 'w') as file:
+            file.write(ascii_art)
+        with open('asciiart/Твоя картинка.txt', 'rb') as file:
+            bot.send_document(message.chat.id, file)
+            toggle = 0
+    elif toggle == 0:
+        bot.send_message(message.chat.id, f"Я не знаю что делать с твоей фотографией")
 
 @bot.message_handler(content_types=['text'])
 def bot_message(message):
