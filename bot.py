@@ -18,8 +18,6 @@ from bs4 import BeautifulSoup
 
 wikipedia.set_lang("ru")
 
-
-
 bot = telebot.TeleBot(TOKEN)
 toggle = 1
 logfile = str(datetime.date.today()) + '.log'
@@ -72,6 +70,131 @@ def get_audio_messages(message):
         bot.reply_to(message, result)
     except sr.UnknownValueError as e:
         bot.send_message(message.from_user.id,  "Прошу прощения, но я не разобрал сообщение, или оно поустое...")
+
+
+MAZE_SIZE = 7
+PATH = 0
+OBSTACLE = 1
+CHARACTER = 2
+
+maze1 = [[1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 1, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1, 0, 1],
+        [1, 0, 0, 1, 0, 0, 1],
+        [1, 0, 1, 0, 1, 0, 1],
+        [1, 0, 0, 0, 1, 0, 1],
+        [1, 1, 1, 1, 1, 0, 1]]
+
+maze2 = [[1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0, 0, 1],
+        [1, 0, 1, 1, 1, 0, 1],
+        [1, 0, 1, 0, 1, 0, 1],
+        [1, 0, 1, 0, 1, 0, 1],
+        [1, 0, 0, 0, 1, 0, 1],
+        [1, 1, 1, 1, 1, 0, 1]]
+
+maze3 = [[1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 1, 0, 0, 1],
+        [1, 0, 1, 0, 1, 1, 1],
+        [1, 0, 1, 1, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1, 0, 1]]
+
+maps = [maze1, maze2, maze3]
+
+maze = random.choice(maps)
+maze_backup = maze
+
+
+char_pos = (1, 1)
+
+offsets = {
+    "up": (-1, 0),
+    "down": (1, 0),
+    "left": (0, -1),
+    "right": (0, 1)
+}
+
+keyboard = telebot.types.InlineKeyboardMarkup()
+keyboard.row(
+    telebot.types.InlineKeyboardButton("Up ⬆️", callback_data="up"),
+)
+keyboard.row(
+    telebot.types.InlineKeyboardButton("Left ⬅️", callback_data="left"),
+    telebot.types.InlineKeyboardButton("Right ➡️", callback_data="right"),
+)
+keyboard.row(
+    telebot.types.InlineKeyboardButton("Down ⬇️", callback_data="down"),
+)
+
+@bot.callback_query_handler(func=lambda call: True)
+def handle_callback_query(call):
+    global char_pos
+    global maze
+    global maps
+    global maze_backup
+    move = call.data
+    new_pos = (char_pos[0] + offsets[move][0], char_pos[1] + offsets[move][1])
+    if can_move(new_pos):
+        maze[char_pos[0]][char_pos[1]] = PATH
+        char_pos = new_pos
+        maze[char_pos[0]][char_pos[1]] = CHARACTER
+        maze_message = generate_maze_message()
+        bot.edit_message_text(maze_message, call.message.chat.id, call.message.message_id, reply_markup=keyboard)
+        if maze[6][5] == CHARACTER:
+            bot.edit_message_text("Вы прошли лабиринт!", call.message.chat.id, call.message.message_id)
+            maze = random.choice(maps)
+            while True:
+                if maze == maze_backup:
+                    maze = random.choice(maps)
+                else:
+                    break
+            maze[char_pos[0]][char_pos[1]] = PATH
+            char_pos, new_pos = (1, 1), (1, 1)
+        else: 
+            pass
+    else:
+        bot.answer_callback_query(call.id, text="Invalid move")
+
+def can_move(pos):
+    if pos[0] < 0 or pos[0] >= MAZE_SIZE or pos[1] < 0 or pos[1] >= MAZE_SIZE:
+        return False
+
+    if maze[pos[0]][pos[1]] == OBSTACLE:
+        return False
+
+    return True
+
+def generate_maze_message():
+    maze_message = ""
+    for row in maze:
+        for cell in row:
+            if cell == 0:
+                maze_message += "⬜️"
+            elif cell == OBSTACLE:
+                maze_message += "🟫"
+            elif cell == CHARACTER:
+                maze_message += "🐭"
+        maze_message += "\n"
+    return maze_message
+
+
+@bot.message_handler(commands=["labirint"])
+def handle_labirint_command(message):
+    maze_message = generate_maze_message()
+    bot.send_message(message.chat.id, maze_message, reply_markup=keyboard)
+    global char_pos
+    global maze
+    global maps
+    global maze_backup
+    while True:
+        if maze == maze_backup:
+            maze = random.choice(maps)
+        else:
+            break
+    char_pos = (1, 1)
+
 
 
 @bot.message_handler(commands=['start'])
@@ -143,11 +266,6 @@ def get_weather(message):
         bot.reply_to(message, f"🏙Погода в городе {city.title()}:\n{russian_description}\n🌡Температура: {temperature}°C\n💧Влажность: {humidity}%\n💨Скорость ветра: {wind_speed} м/с.")
     else:
         bot.reply_to(message, "К сожалению, не удалось найти информацию о погоде в этом городе.")
-
-
-bot.polling()
-bot.polling()
-
 
 @bot.message_handler(commands=['new_note'])
 def new_note_handler(message):
@@ -352,6 +470,15 @@ def econom_static(message):
             bot.send_message(message.chat.id, "Знаете, если ваши расходы превышают доходы, у налоговой будет много вопросов к вам, но я не в праве Вам мешать:")
         bot.reply_to(message, f"👛Ваш кошелек:\n💠Общая сумма: {total}\n➖Затрат за все время: {ub}\n➕Прибыль за все время: {summ}\n")
 
+@bot.message_handler(commands=['news'])
+def news(message):
+    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    button1 = types.KeyboardButton('Наука')
+    button2 = types.KeyboardButton('Спорт')
+    button3 = types.KeyboardButton('Технологии')
+    bt = types.KeyboardButton('⬅️Назад')
+    keyboard.add(button1, button2, button3, bt)
+    bot.send_message(message.chat.id, "Выберите категорию новостей:", reply_markup=keyboard)
 
 @bot.message_handler(content_types=['photo'])
 def handle_photo(message):
@@ -500,6 +627,8 @@ def calc(message):
         bot.send_message(message.from_user.id, '0', reply_markup=keyboardd)
     else:
         bot.send_message(message.from_user.id, value, reply_markup=keyboardd)
+
+
 @bot.callback_query_handler(func=lambda call: True)
 def calback(query):
     global value, old_value
@@ -534,17 +663,6 @@ def calback(query):
             old_value = value
     if value == 'ошибка':
         value = '0'
-
-
-@bot.message_handler(commands=['news'])
-def news(message):
-    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    button1 = types.KeyboardButton('Наука')
-    button2 = types.KeyboardButton('Спорт')
-    button3 = types.KeyboardButton('Технологии')
-    bt = types.KeyboardButton('⬅️Назад')
-    keyboard.add(button1, button2, button3, bt)
-    bot.send_message(message.chat.id, "Выберите категорию новостей:", reply_markup=keyboard)
 
 @bot.message_handler(content_types=['text'])
 def bot_message(message):
@@ -587,9 +705,11 @@ def bot_message(message):
             button1 = types.KeyboardButton('/roulet')
             button2 = types.KeyboardButton('/calculator')
             button3 = types.KeyboardButton('/weather')
+            button4 = types.KeyboardButton('/news')
+            button5 = types.KeyboardButton('/labirint')
             bt = types.KeyboardButton('⬅️Назад')
             bt2 = types.KeyboardButton('Генератор')
-            keyboard.add(button1, button2, button3, bt2, bt)
+            keyboard.add(button1, button2, button3, button4, button5, bt2, bt)
             bot.send_message(message.chat.id, "Добро пожаловать в раздел безделушек. Единтсвенное что тут етсь это баганный калькулятор, но сегодня днем будет не только калькулятор!", reply_markup=keyboard)
         elif message.text == '🖼Изображения':
             keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
