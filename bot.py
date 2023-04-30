@@ -370,7 +370,7 @@ def handle_photo(message):
         file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
         downloaded_file = bot.download_file(file_info.file_path)
 
-        src = 'border/' + file_info.file_path
+        src = 'border/imagee.jpg'
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
         background = Image.open(src)
@@ -383,7 +383,7 @@ def handle_photo(message):
         file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
         downloaded_file = bot.download_file(file_info.file_path)
 
-        src = 'border/' + file_info.file_path
+        src = 'border/imagee.jpg'
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
         background = Image.open(src)
@@ -396,7 +396,7 @@ def handle_photo(message):
         file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
         downloaded_file = bot.download_file(file_info.file_path)
 
-        src = 'border/' + file_info.file_path
+        src = 'border/imagee.jpg'
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
         background = Image.open(src)
@@ -409,7 +409,7 @@ def handle_photo(message):
         file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
         downloaded_file = bot.download_file(file_info.file_path)
 
-        src = 'border/' + file_info.file_path
+        src = 'border/imagee.jpg'
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
         background = Image.open(src)
@@ -422,7 +422,7 @@ def handle_photo(message):
         file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
         downloaded_file = bot.download_file(file_info.file_path)
 
-        src = 'border/' + file_info.file_path
+        src = 'border/imagee.jpg'
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
         background = Image.open(src)
@@ -435,7 +435,7 @@ def handle_photo(message):
         file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
         downloaded_file = bot.download_file(file_info.file_path)
 
-        src = 'border/' + file_info.file_path
+        src = 'border/imagee.jpg'
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
         background = Image.open(src)
@@ -448,7 +448,7 @@ def handle_photo(message):
         file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
         downloaded_file = bot.download_file(file_info.file_path)
 
-        src = 'border/' + file_info.file_path
+        src = 'border/imagee.jpg'
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
         background = Image.open(src)
@@ -461,7 +461,7 @@ def handle_photo(message):
         file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
         downloaded_file = bot.download_file(file_info.file_path)
 
-        src = 'border/' + file_info.file_path
+        src = 'border/imagee.jpg'
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
         background = Image.open(src)
@@ -474,7 +474,7 @@ def handle_photo(message):
         file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
         downloaded_file = bot.download_file(file_info.file_path)
 
-        src = 'border/' + file_info.file_path
+        src = 'border/imagee.jpg'
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
         background = Image.open(src)
@@ -573,7 +573,7 @@ def bot_message(message):
             keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
             button1 = types.KeyboardButton('/roulet')
             button2 = types.KeyboardButton('/calculator')
-            button2 = types.KeyboardButton('/weather')
+            button3 = types.KeyboardButton('/weather')
             bt = types.KeyboardButton('⬅️Назад')
             bt2 = types.KeyboardButton('Генератор')
             keyboard.add(button1, button2, button3, bt2, bt)
