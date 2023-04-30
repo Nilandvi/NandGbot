@@ -3,7 +3,7 @@
 import telebot
 from telebot import types
 import random
-from data.config import TOKEN
+from data.config import TOKEN, API_KEY
 from data.models import User, Note, Session, Economic, Inco, Calc
 import pywhatkit as kit
 import os
@@ -109,6 +109,44 @@ def handle_roulette(message):
         bot.edit_message_text(chat_id=message.chat.id, message_id=msg.message_id, text="Вы проиграли :(")
     else:
         bot.edit_message_text(chat_id=message.chat.id, message_id=msg.message_id, text="Вы победили!")
+
+weather_dict = {
+    'Clear': '☀️Ясно',
+    'Clouds': '☁️Облачно',
+    'Drizzle': '🌦Морось',
+    'Rain': '🌧Дождь',
+    'Thunderstorm': '⛈Гроза',
+    'Snow': '🌨Снег',
+    'Mist': '😶‍🌫️Туман'
+}
+
+@bot.message_handler(commands=['start', 'help'])
+def send_welcome(message):
+    bot.reply_to(message, "Привет! Я бот, который показывает прогноз погоды. Чтобы начать, отправьте команду /weather и укажите город, о котором хотите узнать погоду.")
+
+@bot.message_handler(commands=['weather'])
+def weather(message):
+    city = bot.reply_to(message, "Какой город вас интересует?")
+    bot.register_next_step_handler(city, get_weather)
+
+def get_weather(message):
+    city = message.text
+    url = f'https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric'
+    response = requests.get(url).json()
+    if response['cod'] == 200:
+        weather_description = response['weather'][0]['main']
+        temperature = response['main']['temp']
+        humidity = response['main']['humidity']
+        wind_speed = response['wind']['speed']
+        russian_description = weather_dict.get(weather_description, weather_description)
+        bot.reply_to(message, f"🏙Погода в городе {city.title()}:\n{russian_description}\n🌡Температура: {temperature}°C\n💧Влажность: {humidity}%\n💨Скорость ветра: {wind_speed} м/с.")
+    else:
+        bot.reply_to(message, "К сожалению, не удалось найти информацию о погоде в этом городе.")
+
+
+bot.polling()
+bot.polling()
+
 
 @bot.message_handler(commands=['new_note'])
 def new_note_handler(message):
@@ -535,9 +573,10 @@ def bot_message(message):
             keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
             button1 = types.KeyboardButton('/roulet')
             button2 = types.KeyboardButton('/calculator')
+            button2 = types.KeyboardButton('/weather')
             bt = types.KeyboardButton('⬅️Назад')
             bt2 = types.KeyboardButton('Генератор')
-            keyboard.add(button1, button2, bt, bt2)
+            keyboard.add(button1, button2, button3, bt2, bt)
             bot.send_message(message.chat.id, "Добро пожаловать в раздел безделушек. Единтсвенное что тут етсь это баганный калькулятор, но сегодня днем будет не только калькулятор!", reply_markup=keyboard)
         elif message.text == '🖼Изображения':
             keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
