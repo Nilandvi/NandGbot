@@ -22,30 +22,7 @@ wikipedia.set_lang("ru")
 bot = telebot.TeleBot(TOKEN)
 toggle = 1
 logfile = str(datetime.date.today()) + '.log'
-value = '0'
-old_value = '0'
 
-keyboardd = telebot.types.InlineKeyboardMarkup()
-keyboardd.row(telebot.types.InlineKeyboardButton(' ', callback_data='no'),
-             telebot.types.InlineKeyboardButton('C', callback_data='C'),
-             telebot.types.InlineKeyboardButton('<=', callback_data='<='),
-             telebot.types.InlineKeyboardButton('/', callback_data='/'))
-keyboardd.row(telebot.types.InlineKeyboardButton('7', callback_data='7'),
-             telebot.types.InlineKeyboardButton('8', callback_data='8'),
-             telebot.types.InlineKeyboardButton('9', callback_data='9'),
-             telebot.types.InlineKeyboardButton('*', callback_data='*'))
-keyboardd.row(telebot.types.InlineKeyboardButton('4', callback_data='4'),
-             telebot.types.InlineKeyboardButton('5', callback_data='5'),
-             telebot.types.InlineKeyboardButton('6', callback_data='6'),
-             telebot.types.InlineKeyboardButton('-', callback_data='-'))
-keyboardd.row(telebot.types.InlineKeyboardButton('1', callback_data='1'),
-             telebot.types.InlineKeyboardButton('2', callback_data='2'),
-             telebot.types.InlineKeyboardButton('3', callback_data='3'),
-             telebot.types.InlineKeyboardButton('+', callback_data='+'))
-keyboardd.row(telebot.types.InlineKeyboardButton(' ', callback_data='no'),
-             telebot.types.InlineKeyboardButton('0', callback_data='0'),
-             telebot.types.InlineKeyboardButton(',', callback_data=','),
-             telebot.types.InlineKeyboardButton('=', callback_data='='))
 
 
 def audio_to_text(dest_name: str):
@@ -166,91 +143,7 @@ maze_backup = maze
 
 char_pos = (1, 1)
 
-offsets = {
-    "up": (-1, 0),
-    "down": (1, 0),
-    "left": (0, -1),
-    "right": (0, 1)
-}
 
-keyboard = telebot.types.InlineKeyboardMarkup()
-keyboard.row(
-    telebot.types.InlineKeyboardButton("Up ⬆️", callback_data="up"),
-)
-keyboard.row(
-    telebot.types.InlineKeyboardButton("Left ⬅️", callback_data="left"),
-    telebot.types.InlineKeyboardButton("Right ➡️", callback_data="right"),
-)
-keyboard.row(
-    telebot.types.InlineKeyboardButton("Down ⬇️", callback_data="down"),
-)
-
-@bot.callback_query_handler(func=lambda call: True)
-def handle_callback_query(call):
-    global char_pos
-    global maze
-    global maps
-    global maze_backup
-    move = call.data
-    new_pos = (char_pos[0] + offsets[move][0], char_pos[1] + offsets[move][1])
-    if can_move(new_pos):
-        maze[char_pos[0]][char_pos[1]] = PATH
-        char_pos = new_pos
-        maze[char_pos[0]][char_pos[1]] = CHARACTER
-        maze_message = generate_maze_message()
-        bot.edit_message_text(maze_message, call.message.chat.id, call.message.message_id, reply_markup=keyboard)
-        if maze[6][5] == CHARACTER:
-            bot.edit_message_text("Вы прошли лабиринт!", call.message.chat.id, call.message.message_id)
-            maze = random.choice(maps)
-            while True:
-                if maze == maze_backup:
-                    maze = random.choice(maps)
-                else:
-                    break
-            maze[char_pos[0]][char_pos[1]] = PATH
-            char_pos, new_pos = (1, 1), (1, 1)
-        else: 
-            pass
-    else:
-        bot.answer_callback_query(call.id, text="Invalid move")
-
-def can_move(pos):
-    if pos[0] < 0 or pos[0] >= MAZE_SIZE or pos[1] < 0 or pos[1] >= MAZE_SIZE:
-        return False
-
-    if maze[pos[0]][pos[1]] == OBSTACLE:
-        return False
-
-    return True
-
-def generate_maze_message():
-    maze_message = ""
-    for row in maze:
-        for cell in row:
-            if cell == 0:
-                maze_message += "⬜️"
-            elif cell == OBSTACLE:
-                maze_message += "🟫"
-            elif cell == CHARACTER:
-                maze_message += "🐭"
-        maze_message += "\n"
-    return maze_message
-
-
-@bot.message_handler(commands=["labirint"])
-def handle_labirint_command(message):
-    maze_message = generate_maze_message()
-    bot.send_message(message.chat.id, maze_message, reply_markup=keyboard)
-    global char_pos
-    global maze
-    global maps
-    global maze_backup
-    while True:
-        if maze == maze_backup:
-            maze = random.choice(maps)
-        else:
-            break
-    char_pos = (1, 1)
 
 
 
@@ -687,6 +580,49 @@ def handle_photo(message):
     elif toggle == 0:
         bot.send_message(message.chat.id, f"Я не знаю что делать с твоей фотографией")
 
+value = '0'
+old_value = '0'
+
+keyboardd = telebot.types.InlineKeyboardMarkup()
+keyboardd.row(telebot.types.InlineKeyboardButton(' ', callback_data='no'),
+             telebot.types.InlineKeyboardButton('C', callback_data='C'),
+             telebot.types.InlineKeyboardButton('<=', callback_data='<='),
+             telebot.types.InlineKeyboardButton('/', callback_data='/'))
+keyboardd.row(telebot.types.InlineKeyboardButton('7', callback_data='7'),
+             telebot.types.InlineKeyboardButton('8', callback_data='8'),
+             telebot.types.InlineKeyboardButton('9', callback_data='9'),
+             telebot.types.InlineKeyboardButton('*', callback_data='*'))
+keyboardd.row(telebot.types.InlineKeyboardButton('4', callback_data='4'),
+             telebot.types.InlineKeyboardButton('5', callback_data='5'),
+             telebot.types.InlineKeyboardButton('6', callback_data='6'),
+             telebot.types.InlineKeyboardButton('-', callback_data='-'))
+keyboardd.row(telebot.types.InlineKeyboardButton('1', callback_data='1'),
+             telebot.types.InlineKeyboardButton('2', callback_data='2'),
+             telebot.types.InlineKeyboardButton('3', callback_data='3'),
+             telebot.types.InlineKeyboardButton('+', callback_data='+'))
+keyboardd.row(telebot.types.InlineKeyboardButton(' ', callback_data='no'),
+             telebot.types.InlineKeyboardButton('0', callback_data='0'),
+             telebot.types.InlineKeyboardButton(',', callback_data=','),
+             telebot.types.InlineKeyboardButton('=', callback_data='='))
+
+offsets = {
+    "up": (-1, 0),
+    "down": (1, 0),
+    "left": (0, -1),
+    "right": (0, 1)
+}
+keyboardddd = telebot.types.InlineKeyboardMarkup()
+keyboardddd.row(
+    telebot.types.InlineKeyboardButton("Up ⬆️", callback_data="up"),
+)
+keyboardddd.row(
+    telebot.types.InlineKeyboardButton("Left ⬅️", callback_data="left"),
+    telebot.types.InlineKeyboardButton("Right ➡️", callback_data="right"),
+)
+keyboardddd.row(
+    telebot.types.InlineKeyboardButton("Down ⬇️", callback_data="down"),
+)
+
 
 @bot.message_handler(commands=['calculator'])
 def calc(message):
@@ -711,31 +647,97 @@ def calback(query):
         return
 
     data = query.data
-    if data == 'no':
-        pass
-    elif data == 'C':
-        value = '0'
-    elif data == '<=':
-        if value != '0':
-            value = value[:len(value)-1]
-    elif data == '=':
-        try:
-            value = str(eval(value[1::]))
-        except:
-            value = 'ошибка'
-    else:
-        value += data
-    if (value != old_value and value != '0') or ('0' != old_value and value == '0'):
-        if value == '0':
-            bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text='0',
-                                  reply_markup=keyboardd)
-            old_value = '0'
+    if data == "" or data == "C" or data == "<=" or data == "/" or data == "7" or data == "8" or data == "9" or data == "*" or data == "4" or data == "5" or data == "6" or data == "-" or data == "1" or data == "2" or data == "3" or data == "+" or data == "0" or data == "," or data == "=":
+        if data == 'no':
+            pass
+        elif data == 'C':
+            value = '0'
+        elif data == '<=':
+            if value != '0':
+                value = value[:len(value)-1]
+        elif data == '=':
+            try:
+                value = str(eval(value[1::]))
+            except:
+                value = 'ошибка'
         else:
-            bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=value,
-                                  reply_markup=keyboardd)
-            old_value = value
-    if value == 'ошибка':
-        value = '0'
+            value += data
+        if (value != old_value and value != '0') or ('0' != old_value and value == '0'):
+            if value == '0':
+                bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text='0',
+                                      reply_markup=keyboardd)
+                old_value = '0'
+            else:
+                bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=value,
+                                      reply_markup=keyboardd)
+                old_value = value
+        if value == 'ошибка':
+            value = '0'
+
+    if data == "up" or data == "left" or data == "right" or data == "down":
+        global char_pos
+        global maze
+        global maps
+        global maze_backup
+        new_pos = (char_pos[0] + offsets[data][0], char_pos[1] + offsets[data][1])
+        if can_move(new_pos):
+            maze[char_pos[0]][char_pos[1]] = PATH
+            char_pos = new_pos
+            maze[char_pos[0]][char_pos[1]] = CHARACTER
+            maze_message = generate_maze_message()
+            bot.edit_message_text(maze_message, query.message.chat.id, query.message.message_id, reply_markup=keyboardddd)
+            if maze[6][5] == CHARACTER:
+                bot.edit_message_text("Вы прошли лабиринт!", query.message.chat.id, query.message.message_id)
+                maze = random.choice(maps)
+                while True:
+                    if maze == maze_backup:
+                        maze = random.choice(maps)
+                    else:
+                        break
+                maze[char_pos[0]][char_pos[1]] = PATH
+                char_pos, new_pos = (1, 1), (1, 1)
+            else: 
+                pass
+        else:
+            bot.answer_callback_query(query.id, text="Invalid move")
+
+def can_move(pos):
+    if pos[0] < 0 or pos[0] >= MAZE_SIZE or pos[1] < 0 or pos[1] >= MAZE_SIZE:
+        return False
+
+    if maze[pos[0]][pos[1]] == OBSTACLE:
+        return False
+
+    return True
+
+def generate_maze_message():
+    maze_message = ""
+    for row in maze:
+        for cell in row:
+            if cell == 0:
+                maze_message += "⬜️"
+            elif cell == OBSTACLE:
+                maze_message += "🟫"
+            elif cell == CHARACTER:
+                maze_message += "🐭"
+        maze_message += "\n"
+    return maze_message
+
+
+@bot.message_handler(commands=["labirint"])
+def handle_labirint_command(message):
+    maze_message = generate_maze_message()
+    bot.send_message(message.chat.id, maze_message, reply_markup=keyboardddd)
+    global char_pos
+    global maze
+    global maps
+    global maze_backup
+    while True:
+        if maze == maze_backup:
+            maze = random.choice(maps)
+        else:
+            break
+    char_pos = (1, 1)
 
 @bot.message_handler(content_types=['text'])
 def bot_message(message):
