@@ -12,7 +12,9 @@ import soundfile as sf
 import speech_recognition as sr
 import requests
 import datetime
+import time
 wikipedia.set_lang("ru")
+
 
 
 bot = telebot.TeleBot(TOKEN)
@@ -87,7 +89,24 @@ def start_handler(message):
     keyboard.add(button1, button2, button3, button4, one_butt)
     bot.reply_to(message, f"👋Добро пожаловать, {user.username}!\nВы успешно зарегистрировались✅\nТелеграм бот на питоне. Вид сбоку.\nХолст. Масло. 🖼",  reply_markup=keyboard)
 
-
+@bot.message_handler(commands=['roulet'])
+def handle_roulette(message):
+    msg = bot.send_message(message.chat.id, "Достали револьвер")
+    time.sleep(3)
+    count_puncts = 0
+    for i in range(9):
+        if count_puncts <= 3:
+            bot.edit_message_text(chat_id=message.chat.id, message_id=msg.message_id, text="Крутим барабан" + '.' * count_puncts)
+            count_puncts += 1
+        else:
+            count_puncts = 0
+        time.sleep(0.5)
+    bullet_location = random.randint(1, 4)
+    user_choice = random.randint(1, 4)
+    if user_choice == bullet_location:
+        bot.edit_message_text(chat_id=message.chat.id, message_id=msg.message_id, text="Вы проиграли :(")
+    else:
+        bot.edit_message_text(chat_id=message.chat.id, message_id=msg.message_id, text="Вы победили!")
 
 @bot.message_handler(commands=['new_note'])
 def new_note_handler(message):
@@ -395,7 +414,7 @@ def bot_message(message):
             bot.send_message(message.chat.id, 'Дурка выехала....')
         elif message.text == '🧸Безделушки':
             keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-            button1 = types.KeyboardButton('null')
+            button1 = types.KeyboardButton('/roulet')
             button2 = types.KeyboardButton('/calculator')
             bt = types.KeyboardButton('⬅️Назад')
             keyboard.add(button1, button2, bt)
