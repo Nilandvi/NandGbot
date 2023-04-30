@@ -101,7 +101,63 @@ maze3 = [[1, 1, 1, 1, 1, 1, 1],
         [1, 0, 0, 0, 0, 0, 1],
         [1, 1, 1, 1, 1, 0, 1]]
 
-maps = [maze1, maze2, maze3]
+maze4 = [[1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 0, 1, 1],
+        [1, 0, 0, 0, 0, 0, 1],
+        [1, 0, 1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1, 0, 1]]
+
+maze5 = [[1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 1, 0, 0, 0, 1],
+        [1, 0, 1, 0, 1, 0, 1],
+        [1, 0, 1, 0, 1, 0, 1],
+        [1, 0, 0, 0, 1, 0, 1],
+        [1, 0, 1, 1, 1, 0, 1],
+        [1, 1, 1, 1, 1, 0, 1]]
+
+maze6 = [[1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 1, 1, 0, 1, 1],
+        [1, 0, 0, 0, 0, 1, 1],
+        [1, 1, 1, 1, 0, 1, 1],
+        [1, 0, 1, 1, 0, 0, 1],
+        [1, 0, 0, 1, 1, 0, 1],
+        [1, 1, 1, 1, 1, 0, 1]]
+
+maze7 = [[1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 1, 0, 0, 1],
+        [1, 0, 0, 1, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1, 0, 1]]
+
+maze8 = [[1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0, 0, 1],
+        [1, 0, 1, 1, 1, 1, 1],
+        [1, 0, 1, 1, 1, 0, 1],
+        [1, 0, 0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1, 0, 1]]
+
+maze9 = [[1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 0, 1, 0, 0, 1],
+        [1, 0, 0, 1, 0, 0, 1],
+        [1, 1, 0, 1, 0, 1, 1],
+        [1, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1, 0, 1]]
+
+maze10 = [[1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 1, 0, 1],
+        [1, 0, 0, 0, 0, 0, 1],
+        [1, 0, 1, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1, 0, 1],
+        [1, 1, 1, 1, 1, 0, 1]]
+
+maps = [maze1, maze2, maze3, maze4, maze5, maze6, maze7, maze8, maze9, maze10]
 
 maze = random.choice(maps)
 maze_backup = maze
@@ -470,16 +526,6 @@ def econom_static(message):
             bot.send_message(message.chat.id, "Знаете, если ваши расходы превышают доходы, у налоговой будет много вопросов к вам, но я не в праве Вам мешать:")
         bot.reply_to(message, f"👛Ваш кошелек:\n💠Общая сумма: {total}\n➖Затрат за все время: {ub}\n➕Прибыль за все время: {summ}\n")
 
-@bot.message_handler(commands=['news'])
-def news(message):
-    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    button1 = types.KeyboardButton('Наука')
-    button2 = types.KeyboardButton('Спорт')
-    button3 = types.KeyboardButton('Технологии')
-    bt = types.KeyboardButton('⬅️Назад')
-    keyboard.add(button1, button2, button3, bt)
-    bot.send_message(message.chat.id, "Выберите категорию новостей:", reply_markup=keyboard)
-
 @bot.message_handler(content_types=['photo'])
 def handle_photo(message):
     global toggle
@@ -714,7 +760,17 @@ def bot_message(message):
         elif message.text == '🖼Изображения':
             keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
             bt = types.KeyboardButton('⬅️Назад')
-            keyboard.add(bt)
+            button1 = types.KeyboardButton('1.0')
+            button2 = types.KeyboardButton('1.1')
+            bt3 = types.KeyboardButton('1.2')
+            button3 = types.KeyboardButton('1.3')
+            button4 = types.KeyboardButton('1.4')
+            bt2 = types.KeyboardButton('1.5')
+            button5 = types.KeyboardButton('1.6')
+            button6 = types.KeyboardButton('1.7')
+            bt4 = types.KeyboardButton('1.8')
+            button7 = types.KeyboardButton('1.9')
+            keyboard.add(button1, button2, bt3, button3, button4, bt2, button5, button6, bt4, button7, bt)
             bot.send_message(message.chat.id, "выберите цифру от 1.0 до 1.9", reply_markup=keyboard)
             img = open('data/image.jpg', 'rb')
             bot.send_photo(message.chat.id, photo=img)
@@ -765,7 +821,7 @@ def bot_message(message):
             bt = types.KeyboardButton('⬅️Назад')
             keyboard.add(bt)
             for news in news_list[:5]:
-                bot.send_message(message.chat.id, news.text, reply_markup=keyboard)
+                print(news.text)
         elif message.text == "Спорт":
             url = "https://www.sport-express.ru/"
             response = requests.get(url)
