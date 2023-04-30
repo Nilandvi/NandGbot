@@ -424,6 +424,9 @@ def bot_message(message):
             bt = types.KeyboardButton('⬅️Назад')
             keyboard.add(bt)
             bot.send_message(message.chat.id, "Раздел в режиме разработки", reply_markup=keyboard)
+        elif message.text == 'Генератор':
+            
+            bot.send_message(message.chat.id, f"Ваше число: {random.randint(1,100)}")
         else:
             word = message.text.strip().lower()
             try:
