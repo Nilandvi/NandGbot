@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Telegram Web Bot</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.0/css/bootstrap.min.css" integrity="sha512-Ld+40aH52ZblJluDrgKjSv1/lFpTIO/+dch8WJ3n4vIspknYpqQoZ8xouWlKvS1TlT/vTzT8Xs75q0z4EIlA0Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Telegram Web App Script -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <style>
+        /* Custom styles for the page */
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+            color: var(--tg-theme-text-color);
+            background: var(--tg-theme-bg-color);
+        }
+
+        .telegram-button {
+            background-color: #0088cc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+
+        .telegram-button:hover {
+            cursor: pointer;
+        }
+
+        /* Telegram style for the button */
+        .telegram-button.tg-button {
+            background-color: var(--tg-button-background-color);
+            color: var(--tg-button-text-color);
+            border-color: var(--tg-button-border-color);
+        }
+
+        /* Custom styles for the text */
+        h1 {
+            font-family: 'Poppins', sans-serif;
+            color: var(--tg-theme-hint-color);
+            font-size: 24px;
+            font-weight: ExtraBold 800;
+            margin-bottom: 10px;
+        }
+
+        .left {
+            text-align: left;
+            }
+
+        .right {
+            text-align: right;
+            }
+
+        h2 {
+            font-family: 'Poppins', sans-serif;
+            color: var(--tg-theme-hint-color);
+            font-size: 20px;
+            font-weight: SemiBold 600 Italic;
+            margin-bottom: 10px;
+            margin-top: 10px;
+        }
+
+        p {
+            font-family: 'Poppins', sans-serif;
+            color: var(--tg-theme-hint-color);
+            font-size: 18px;
+        }
+
+        h3 {
+            font-family: 'Poppins', sans-serif;
+            color: var(--tg-theme-hint-color);
+            font-size: 18px;
+            font-weight: Light 300;
+        }
+    </style>
+
+    <!-- Google Fonts (Poppins) -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+
+</head>
+<body class="container">
+
+    <img src="https://i.imgur.com/uzfD6oR.png" alt="Our Project">
+
+    <h1>N&G TG bot</h1>
+    <h2>Описание бота</h2>
+    <p>N&G бот - это чат-бот, созданный для предоставления пользователям полезной информации. Бот содержит различные функции, такие как встроенная википедия, ascii художник и фоторедактор, заметки и бюджет менеджер. Также в боте есть генератор чисел, конвертер голосовых сообщений.</p>
+    <h2>Как использовать бота</h2>
+    <p>После успешного прохождения регестрации у пользователя появляется интерактивное меню со всеми возможными командами для бота. Пользователю достаточно нажать на интересующий его пункт, после чего бот высветит полную подсказку по использованию возможностей этого раздела. Чтобы получить статью с википедии, пользователю стоит просто написать сообщение. Для расшифровки аудио в текст, пользователь должен просто приславть свое аудиосообщение</p>
+    <h2>Команды</h2>
+    <p>В N&G боте все разделено по отсекам. При использовании той или иной функции, бот проконсультирует Вас и расскажет, за что какая команда отвечает. Полный список всех команд:</p>
+    <h3 class="left">Заметки</h3>
+    <p class="left">●/new_note - позволяет пользователю создать новую заметку</p>
+    <p class="left">●/show_notes - показывает пользователю все его заметки</p>
+    <p class="left">●/delete_note - позволяет пользователю удалить его ранее записанную заметку</p>
+    <h3 class="left">Кошелек</h3>
+    <p class="left">●/expenses - позволяет пользователю добавить расходы</p>
+    <p class="left">●/show_expenses - позволяет пользователю посмотреть историю его расходов</p>
+    <p class="left">●/incomes - позволяет пользователю добавить зачисления</p>
+    <p class="left">●/show_incomes - позволяет пользователю посмотреть историю его зачислений</p>
+    <p class="left">●/static - общая статистика и личный кошелек. Позволяет пользователю посмотреть его бюджет, общее кол-во трат и зачислений</p>
+    <h3 class="left">Изображения</h3>
+    <p class="left">●Пользователь должен выбрать цифру обработки изображения, после чего бот отправит обработанное изображение</p>
+    <h3 class="left">Википедия</h3>
+    <p class="left">●Пользователь должен отправить сообщение, после чего бот скинет статью с википедии</p>
+    <h3 class="left">Видео</h3>
+    <p class="left">●Пользователь должен отправить видео длинной менее 1 минуты и объемом меньше 8мб, после чего бот отправит его вам как видеосообщение</p>
+    <h3 class="left">Аудиосообщения</h3>
+    <p class="left">●Бот может расшифровывть голосовые сообщения пользователя и отправлять ему текст. Для этого стоит простоотправить боту голосоое сообщение</p>
+    <h3 class="left">Безделушки</h3>
+    <p class="left">●Генератор - генерирует рандомное число от 1 до 1000</p>
+    <p class="left">●/calculator - функционирующий калькулятор</p>
+    <p class="left">●/weather - показывает пользователю информацию о погоде в интересубщем его городе</p>
+    <p class="left">●/roulet - игра в русскую рулетку. Позволяет пользователю испытать свою удачу</p>
+    <p class="left">●/labirint - миниигра где мышка пытается найти выход из тунелей</p>
+    <h2>Связь с разработчиками</h2>
+    <p> Если пользователь обнаружил недоработку или баг в работе N&G бота, он может связаться с разработчиками бота, используя кнопку ниже и мы попытаемся исправить проблему в ближайшее время</p>
+    <button class="telegram-button" onclick="openTelegramContact()">Отправить сообщение</button>
+    <p>Надеемся, что данная документация поможет пользователям быстрее и эффективнее использовать функции N&G бота. Если у вас возникнут дополнительные вопросы или проблемы, не стесняйтесь связаться с разработчиками бота.</p>
+        <script>
+            // Function to open Telegram contact with message
+            function openTelegramContact() {
+                var message = "Здравствуйте! Я бы хотел задать вопрос о вашем проекте.";
+                var url = "https://t.me/Nilandvi?start=" + encodeURIComponent(message);
+                window.open(url);
+            }
+        </script>
+
+        <!-- Bootstrap 5 JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.0/js/bootstrap.bundle.min.js" integrity="sha512-lYVpL8e3htuJavt3Pm+0snw5wy3dYo/bprl5/5idZcI7R0zDGQ+PDi5xlCfQcS1b8JMxxpgMIX/DiikgJfZ4/Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</body>
+</html>
