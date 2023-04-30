@@ -417,16 +417,35 @@ def bot_message(message):
             button1 = types.KeyboardButton('/roulet')
             button2 = types.KeyboardButton('/calculator')
             bt = types.KeyboardButton('⬅️Назад')
-            keyboard.add(button1, button2, bt)
+            bt2 = types.KeyboardButton('Генератор')
+            keyboard.add(button1, button2, bt, bt2)
             bot.send_message(message.chat.id, "Добро пожаловать в раздел безделушек. Единтсвенное что тут етсь это баганный калькулятор, но сегодня днем будет не только калькулятор!", reply_markup=keyboard)
         elif message.text == '🖼Изображения':
             keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
             bt = types.KeyboardButton('⬅️Назад')
             keyboard.add(bt)
             bot.send_message(message.chat.id, "Раздел в режиме разработки", reply_markup=keyboard)
+        elif message.text == '2' or message.text == '10' or message.text == '20' or message.text == '50' or message.text == '100' or message.text == '1000':
+            keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+            bt = types.KeyboardButton('⬅️Назад')
+            keyboard.add(bt)
+            bot.send_message(message.chat.id, str(random.randint(1, int(message.text))), reply_markup=keyboard)
         elif message.text == 'Генератор':
-            
-            bot.send_message(message.chat.id, f"Ваше число: {random.randint(1,100)}")
+            keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+            button1 = types.KeyboardButton('2')
+            button2 = types.KeyboardButton('10')
+            bt = types.KeyboardButton('20')
+            button3 = types.KeyboardButton('50')
+            button4 = types.KeyboardButton('100')
+            bt2 = types.KeyboardButton('1000')
+            keyboard.add(button1)
+            keyboard.add(button2)
+            keyboard.add(bt)
+            keyboard.add(button3)
+            keyboard.add(button4)
+            keyboard.add(bt2)
+            bot.send_message(message.chat.id, 'Введите число, до которого нужно сгенерировать рандомное число:', reply_markup=keyboard)
+
         else:
             word = message.text.strip().lower()
             try:
