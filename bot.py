@@ -17,7 +17,6 @@ from PIL import Image
 from bs4 import BeautifulSoup
 from moviepy.editor import *
 
-
 wikipedia.set_lang("ru")
 
 bot = telebot.TeleBot(TOKEN)
@@ -159,15 +158,7 @@ maze10 = [[1, 1, 1, 1, 1, 1, 1],
         [1, 1, 1, 1, 1, 0, 1],
         [1, 1, 1, 1, 1, 0, 1]]
 
-maze11 = [[1, 1, 0, 1, 0, 0, 1],
-        [1, 0, 0, 1, 1, 0, 1],
-        [1, 0, 1, 1, 1, 0, 1],
-        [1, 0, 1, 1, 0, 0, 0],
-        [1, 0, 0, 1, 0, 1, 0],
-        [1, 1, 0, 0, 0, 1, 0],
-        [0, 0, 0, 1, 1, 0, 0]]
-
-maps = [maze1, maze2, maze3, maze4, maze5, maze6, maze7, maze8, maze9, maze10, maze11]
+maps = [maze1, maze2, maze3, maze4, maze5, maze6, maze7, maze8, maze9, maze10]
 
 maze = random.choice(maps)
 maze_backup = maze
@@ -266,11 +257,11 @@ def handle_labirint_command(message):
 @bot.message_handler(commands=['start'])
 def start_handler(message):
     with Session() as session:
-        user = session.query(User).filter_by(chat_id=message.chat.id).first()
-        if user is None:
+        if session.query(User).filter_by(chat_id=message.chat.id).first() is None:
             user = User(chat_id=message.chat.id, username=message.chat.username)
             session.add(user)
             session.commit()
+        user = session.query(User).filter_by(chat_id=message.chat.id).first()
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
     button1 = types.KeyboardButton('🗓Заметки')
     button2 = types.KeyboardButton('📊Кошелек')
@@ -283,12 +274,12 @@ def start_handler(message):
 
 @bot.message_handler(commands=['roulet'])
 def handle_roulette(message):
-    msg = bot.send_message(message.chat.id, "🔫 Достали револьвер")
+    msg = bot.send_message(message.chat.id, "Достали револьвер")
     time.sleep(3)
     count_puncts = 0
     for i in range(9):
         if count_puncts <= 3:
-            bot.edit_message_text(chat_id=message.chat.id, message_id=msg.message_id, text="🔫 Крутим барабан" + '.' * count_puncts)
+            bot.edit_message_text(chat_id=message.chat.id, message_id=msg.message_id, text="Крутим барабан" + '.' * count_puncts)
             count_puncts += 1
         else:
             count_puncts = 0
@@ -310,13 +301,10 @@ weather_dict = {
     'Mist': '😶‍🌫️Туман'
 }
 
-@bot.message_handler(commands=['start', 'help'])
-def send_welcome(message):
-    bot.reply_to(message, "Привет! Я бот, который показывает прогноз погоды. Чтобы начать, отправьте команду /weather и укажите город, о котором хотите узнать погоду.")
 
 @bot.message_handler(commands=['weather'])
 def weather(message):
-    city = bot.reply_to(message, "Какой город вас интересует?⛅")
+    city = bot.reply_to(message, "Какой город вас интересует?")
     bot.register_next_step_handler(city, get_weather)
 
 def get_weather(message):
@@ -790,11 +778,12 @@ def bot_message(message):
             button1 = types.KeyboardButton('/roulet')
             button2 = types.KeyboardButton('/calculator')
             button3 = types.KeyboardButton('/weather')
+            button4 = types.KeyboardButton('/news')
             button5 = types.KeyboardButton('/labirint')
             bt = types.KeyboardButton('⬅️Назад')
-            bt2 = types.KeyboardButton('🎰 Генератор')
-            keyboard.add(button1, button2, button3, button5, bt2, bt)
-            bot.send_message(message.chat.id, "Добро пожаловать в раздел безделушек. Команды:\n1. /roulet - 🔫русская рулетка\n2./calculator - 🧮калькулятор\n3. /weather - ⛅прогноз погоды в любой город мира))\n4. /labirint - 🧠игра лабиринт\n5. 🎰 Генератор - рандомайзер для любого числа\n 📸вы также можете отправить видео и я сделаю из него кружок)\n Приятного пользования!", reply_markup=keyboard)
+            bt2 = types.KeyboardButton('Генератор')
+            keyboard.add(button1, button2, button3, button4, button5, bt2, bt)
+            bot.send_message(message.chat.id, "Добро пожаловать в раздел безделушек. Единтсвенное что тут етсь это баганный калькулятор, но сегодня днем будет не только калькулятор!", reply_markup=keyboard)
         elif message.text == '🖼Изображения':
             keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
             bt = types.KeyboardButton('⬅️Назад')
@@ -819,13 +808,13 @@ def bot_message(message):
             keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
             bt = types.KeyboardButton('⬅️Назад')
             keyboard.add(bt)
-            bot.send_message(message.chat.id, "🗾отправь картинку:", reply_markup=keyboard)
+            bot.send_message(message.chat.id, "отправь картинку:", reply_markup=keyboard)
         elif message.text.isdigit():
             keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
             bt = types.KeyboardButton('⬅️Назад')
             keyboard.add(bt)
             bot.send_message(message.chat.id, str(random.randint(1, int(message.text))), reply_markup=keyboard)
-        elif message.text == '🎰 Генератор':
+        elif message.text == 'Генератор':
             keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
             button1 = types.KeyboardButton('2')
             button2 = types.KeyboardButton('10')
