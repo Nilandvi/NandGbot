@@ -14,6 +14,7 @@ import requests
 import datetime
 import time
 from PIL import Image
+from bs4 import BeautifulSoup
 
 wikipedia.set_lang("ru")
 
@@ -533,6 +534,18 @@ def calback(query):
             old_value = value
     if value == 'ошибка':
         value = '0'
+
+
+@bot.message_handler(commands=['news'])
+def news(message):
+    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    button1 = types.KeyboardButton('Наука')
+    button2 = types.KeyboardButton('Спорт')
+    button3 = types.KeyboardButton('Технологии')
+    bt = types.KeyboardButton('⬅️Назад')
+    keyboard.add(button1, button2, button3, bt)
+    bot.send_message(message.chat.id, "Выберите категорию новостей:", reply_markup=keyboard)
+
 @bot.message_handler(content_types=['text'])
 def bot_message(message):
     global toggle
@@ -613,6 +626,36 @@ def bot_message(message):
             keyboard.add(button4)
             keyboard.add(bt2)
             bot.send_message(message.chat.id, 'Введите число, до которого нужно сгенерировать рандомное число:', reply_markup=keyboard)
+        elif message.text == 'Наука':
+            url = "https://www.sciencedaily.com/"
+            response = requests.get(url)
+            soup = BeautifulSoup(response.content, "html.parser")
+            news_list = soup.find_all("div", class_="latest-head")
+            keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+            bt = types.KeyboardButton('⬅️Назад')
+            keyboard.add(bt)
+            for news in news_list[:5]:
+                bot.send_message(message.chat.id, news.text, reply_markup=keyboard)
+        elif message.text == 'Технологии':
+            url = "https://www.theverge.com/"
+            response = requests.get(url)
+            soup = BeautifulSoup(response.content, "html.parser")
+            news_list = soup.find_all("h2", class_="c-entry-box--compact__title")
+            keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+            bt = types.KeyboardButton('⬅️Назад')
+            keyboard.add(bt)
+            for news in news_list[:5]:
+                bot.send_message(message.chat.id, news.text, reply_markup=keyboard)
+        elif message.text == "Спорт":
+            url = "https://www.sport-express.ru/"
+            response = requests.get(url)
+            soup = BeautifulSoup(response.content, "html.parser")
+            news_list = soup.find_all("div", class_="se21-all-news-item__name")
+            keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+            bt = types.KeyboardButton('⬅️Назад')
+            keyboard.add(bt)
+            for news in news_list[:5]:
+                bot.send_message(message.chat.id, news.text, reply_markup=keyboard)
 
         else:
             word = message.text.strip().lower()
@@ -633,4 +676,4 @@ def bot_message(message):
             bot.send_message(message.chat.id, final_message, parse_mode="HTML")
 
 
-bot.polling(none_stop=True, interval=0)
+bot.polling()
