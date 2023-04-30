@@ -15,6 +15,8 @@ import datetime
 import time
 from PIL import Image
 from bs4 import BeautifulSoup
+from moviepy.editor import *
+
 
 wikipedia.set_lang("ru")
 
@@ -447,6 +449,35 @@ def incoms(message):
     bot.reply_to(message, '❇️Введите доходы целым числом:')
     bot.register_next_step_handler(message, incom, user.id)
 
+@bot.message_handler(content_types=['video'])
+def handle_video(message):
+    if message.video.duration > 60:
+        bot.reply_to(message, "📛📛Извини, но я не могу обработать это видео, его длина больше 1 минуты")
+        return
+    
+    file_info = bot.get_file(message.video.file_id)
+    video_url = f"https://api.telegram.org/file/bot{bot.token}/{file_info.file_path}"
+    video_file = requests.get(video_url)
+    
+    if len(video_file.content) > 8 * 1024 * 1024:
+        bot.reply_to(message, "📛Извини, но я не могу обработать это видео, его размер больше 8MB.")
+        return
+    
+    os.makedirs("voice", exist_ok=True)
+    with open("voice/curcle.mp4", "wb") as f:
+        f.write(video_file.content)
+    
+    video = VideoFileClip("voice/curcle.mp4")
+    video = video.crop(x1=0, y1=0, x2=min(video.w, video.h), y2=min(video.w, video.h))
+    video = video.resize(height=640)  
+    video = video.resize(width=640)
+    video = video.resize(0.5)
+    video.write_videofile("voice/curcle_processed.mp4", codec="libx264", audio_codec="aac")
+
+    with open("voice/curcle_processed.mp4", "rb") as f:
+        msg = bot.send_video_note(message.chat.id, f, duration=video.duration, timeout=600)
+    os.remove("voice/curcle.mp4")
+    os.remove("voice/curcle_processed.mp4")
 
 def incom(message, user_id):
     session = Session()
