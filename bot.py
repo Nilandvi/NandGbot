@@ -13,6 +13,8 @@ import speech_recognition as sr
 import requests
 import datetime
 import time
+from PIL import Image
+
 wikipedia.set_lang("ru")
 
 
@@ -315,7 +317,7 @@ def econom_static(message):
 @bot.message_handler(content_types=['photo'])
 def handle_photo(message):
     global toggle
-    if toggle == 1:
+    if toggle == '1.0':
         photo = message.photo[-1]
         file_info = bot.get_file(photo.file_id)
         downloaded_file = bot.download_file(file_info.file_path)
@@ -326,7 +328,123 @@ def handle_photo(message):
             file.write(ascii_art)
         with open('asciiart/Твоя картинка.txt', 'rb') as file:
             bot.send_document(message.chat.id, file)
-            toggle = 0
+    elif toggle == '1.1':
+        file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
+        downloaded_file = bot.download_file(file_info.file_path)
+
+        src = 'border/' + file_info.file_path
+        with open(src, 'wb') as new_file:
+            new_file.write(downloaded_file)
+        background = Image.open(src)
+        foreground = Image.open("border/border1.png")
+        s = background.size
+        foreground = foreground.resize(s)
+        background.paste(foreground, (0, 0), foreground)
+        bot.send_photo(message.chat.id, background)
+    elif toggle == '1.2':
+        file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
+        downloaded_file = bot.download_file(file_info.file_path)
+
+        src = 'border/' + file_info.file_path
+        with open(src, 'wb') as new_file:
+            new_file.write(downloaded_file)
+        background = Image.open(src)
+        foreground = Image.open("border/border9.png")
+        s = background.size
+        foreground = foreground.resize(s)
+        background.paste(foreground, (0, 0), foreground)
+        bot.send_photo(message.chat.id, background)
+    elif toggle == '1.3':
+        file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
+        downloaded_file = bot.download_file(file_info.file_path)
+
+        src = 'border/' + file_info.file_path
+        with open(src, 'wb') as new_file:
+            new_file.write(downloaded_file)
+        background = Image.open(src)
+        foreground = Image.open("border/border4.png")
+        s = background.size
+        foreground = foreground.resize(s)
+        background.paste(foreground, (0, 0), foreground)
+        bot.send_photo(message.chat.id, background)
+    elif toggle == '1.4':
+        file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
+        downloaded_file = bot.download_file(file_info.file_path)
+
+        src = 'border/' + file_info.file_path
+        with open(src, 'wb') as new_file:
+            new_file.write(downloaded_file)
+        background = Image.open(src)
+        foreground = Image.open("border/border3 .png")
+        s = background.size
+        foreground = foreground.resize(s)
+        background.paste(foreground, (0, 0), foreground)
+        bot.send_photo(message.chat.id, background)
+    elif toggle == '1.5':
+        file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
+        downloaded_file = bot.download_file(file_info.file_path)
+
+        src = 'border/' + file_info.file_path
+        with open(src, 'wb') as new_file:
+            new_file.write(downloaded_file)
+        background = Image.open(src)
+        foreground = Image.open("border/border.png")
+        s = background.size
+        foreground = foreground.resize(s)
+        background.paste(foreground, (0, 0), foreground)
+        bot.send_photo(message.chat.id, background)
+    elif toggle == '1.6':
+        file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
+        downloaded_file = bot.download_file(file_info.file_path)
+
+        src = 'border/' + file_info.file_path
+        with open(src, 'wb') as new_file:
+            new_file.write(downloaded_file)
+        background = Image.open(src)
+        foreground = Image.open("border/border2.png")
+        s = background.size
+        foreground = foreground.resize(s)
+        background.paste(foreground, (0, 0), foreground)
+        bot.send_photo(message.chat.id, background)
+    elif toggle == '1.7':
+        file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
+        downloaded_file = bot.download_file(file_info.file_path)
+
+        src = 'border/' + file_info.file_path
+        with open(src, 'wb') as new_file:
+            new_file.write(downloaded_file)
+        background = Image.open(src)
+        foreground = Image.open("border/border7.png")
+        s = background.size
+        foreground = foreground.resize(s)
+        background.paste(foreground, (0, 0), foreground)
+        bot.send_photo(message.chat.id, background)
+    elif toggle == '1.8':
+        file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
+        downloaded_file = bot.download_file(file_info.file_path)
+
+        src = 'border/' + file_info.file_path
+        with open(src, 'wb') as new_file:
+            new_file.write(downloaded_file)
+        background = Image.open(src)
+        foreground = Image.open("border/border6.png")
+        s = background.size
+        foreground = foreground.resize(s)
+        background.paste(foreground, (0, 0), foreground)
+        bot.send_photo(message.chat.id, background)
+    elif toggle == '1.9':
+        file_info = bot.get_file(message.photo[len(message.photo) - 1].file_id)
+        downloaded_file = bot.download_file(file_info.file_path)
+
+        src = 'border/' + file_info.file_path
+        with open(src, 'wb') as new_file:
+            new_file.write(downloaded_file)
+        background = Image.open(src)
+        foreground = Image.open("border/border5.png")
+        s = background.size
+        foreground = foreground.resize(s)
+        background.paste(foreground, (0, 0), foreground)
+        bot.send_photo(message.chat.id, background)
     elif toggle == 0:
         bot.send_message(message.chat.id, f"Я не знаю что делать с твоей фотографией")
 
@@ -379,6 +497,7 @@ def calback(query):
         value = '0'
 @bot.message_handler(content_types=['text'])
 def bot_message(message):
+    global toggle
     session = Session()
     user = session.query(User).filter_by(chat_id=message.chat.id).first()
     if message.chat.type == "private":
@@ -424,8 +543,18 @@ def bot_message(message):
             keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
             bt = types.KeyboardButton('⬅️Назад')
             keyboard.add(bt)
-            bot.send_message(message.chat.id, "Раздел в режиме разработки", reply_markup=keyboard)
-        elif message.text == '2' or message.text == '10' or message.text == '20' or message.text == '50' or message.text == '100' or message.text == '1000':
+            bot.send_message(message.chat.id, "выберите цифру от 1.0 до 1.9", reply_markup=keyboard)
+            img = open('data/image.jpg', 'rb')
+            bot.send_photo(message.chat.id, photo=img)
+        elif message.text == '1.0' or message.text == '1.1' or message.text == '1.2' or message.text == '1.3' or \
+                message.text == '1.4' or message.text == '1.5' or message.text == '1.6' or message.text == '1.7' or \
+                message.text == '1.8' or message.text == '1.9':
+            toggle = message.text
+            keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+            bt = types.KeyboardButton('⬅️Назад')
+            keyboard.add(bt)
+            bot.send_message(message.chat.id, "отправь картинку:", reply_markup=keyboard)
+        elif message.text.isdigit():
             keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
             bt = types.KeyboardButton('⬅️Назад')
             keyboard.add(bt)
