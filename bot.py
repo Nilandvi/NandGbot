@@ -80,11 +80,11 @@ def start_handler(message):
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
     button1 = types.KeyboardButton('🗓Заметки')
     button2 = types.KeyboardButton('📊Кошелек')
-    button3 = types.KeyboardButton('👨‍💻Разработчики')
+    button3 = types.KeyboardButton('🧸Безделушки')
+    button4 = types.KeyboardButton('🖼Изображения')
     webAppTest = types.WebAppInfo("https://nilandvi.github.io/NandGbotWEB/") #создаем webappinfo - формат хранения url
-    one_butt = types.KeyboardButton(text="Web🌐", web_app=webAppTest) #создаем кнопку типа webapp
-    button4 = types.KeyboardButton('ℹ️Помощь')
-    keyboard.add(button1, button2, button3, one_butt, button4)
+    one_butt = types.KeyboardButton(text="ℹ️Помощь", web_app=webAppTest) #создаем кнопку типа webapp
+    keyboard.add(button1, button2, button3, button4, one_butt)
     bot.reply_to(message, f"👋Добро пожаловать, {user.username}!\nВы успешно зарегистрировались✅\nТелеграм бот на питоне. Вид сбоку.\nХолст. Масло. 🖼",  reply_markup=keyboard)
 
 
@@ -385,22 +385,26 @@ def bot_message(message):
                 keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
                 button1 = types.KeyboardButton('🗓Заметки')
                 button2 = types.KeyboardButton('📊Кошелек')
-                button3 = types.KeyboardButton('👨‍💻Разработчики')
-                button4 = types.KeyboardButton('ℹ️Помощь')
-                keyboard.add(button1, button2, button3, button4)
+                button3 = types.KeyboardButton('🧸Безделушки')
+                button4 = types.KeyboardButton('🖼Изображения')
+                webAppTest = types.WebAppInfo("https://nilandvi.github.io/NandGbotWEB/") #создаем webappinfo - формат хранения url
+                one_butt = types.KeyboardButton(text="ℹ️Помощь", web_app=webAppTest) #создаем кнопку типа webapp
+                keyboard.add(button1, button2, button3, button4, one_butt)
                 bot.send_message(message.chat.id, f"Привет, {user.username}\n✅Ты в главном меню",  reply_markup=keyboard)
-        elif message.text == "👨‍💻Разработчики":
-            keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-            bt = types.KeyboardButton('⬅️Назад')
-            keyboard.add(bt)
-            bot.reply_to(message, f"👨‍💻Разработчики👨‍💻\n@Nilandvi\n@hochypitsu",  reply_markup=keyboard)
-        elif message.text == "ℹ️Помощь":
-            keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-            bt = types.KeyboardButton('⬅️Назад')
-            keyboard.add(bt)
-            bot.send_message(message.chat.id, "Добро пожаловать в N&G бот 👋\nВ этом боте ты сможешь найти много полезного✅\nПомимо большого разнообразия различного контента в боте есть ascii художник и встроенная википедия. \nКоманды ты сможешь найти при переходе на различные пункты.\n🔹Чтобы воспользоваться википедией, тебе достаточно написать интересующее тебе слово мне, и я с радостью предоставлю тебе интересующую информацию.\n🔹Чтобы воспользоваться функционалом ascii художника, просто кидай мне фотографию, а там я сам управлюсь и отправлю тебе результат!\nчтобы перевести голосовое сообщение в текст просто запиши его,а я отправлю готовый результат!\n=====\nУдачного тебе пользования ботом! \nВ случае обнаружения недоработки или бага, зайди в меню разработчиков и напиши нам о недоработке, может быть мы ее пофиксим!\n", reply_markup=keyboard)
         elif message.text == 'отсоси мне':
             bot.send_message(message.chat.id, 'Дурка выехала....')
+        elif message.text == '🧸Безделушки':
+            keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+            button1 = types.KeyboardButton('null')
+            button2 = types.KeyboardButton('/calculator')
+            bt = types.KeyboardButton('⬅️Назад')
+            keyboard.add(button1, button2, bt)
+            bot.send_message(message.chat.id, "Добро пожаловать в раздел безделушек. Единтсвенное что тут етсь это баганный калькулятор, но сегодня днем будет не только калькулятор!", reply_markup=keyboard)
+        elif message.text == '🖼Изображения':
+            keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+            bt = types.KeyboardButton('⬅️Назад')
+            keyboard.add(bt)
+            bot.send_message(message.chat.id, "Раздел в режиме разработки", reply_markup=keyboard)
         else:
             word = message.text.strip().lower()
             try:
