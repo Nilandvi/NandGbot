@@ -507,7 +507,7 @@ def handle_photo(message):
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
         background = Image.open(src)
-        foreground = Image.open("border/border3 .png")
+        foreground = Image.open("border/border3.png")
         s = background.size
         foreground = foreground.resize(s)
         background.paste(foreground, (0, 0), foreground)
